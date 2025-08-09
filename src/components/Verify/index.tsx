@@ -33,35 +33,34 @@ export function Verify({ onSuccess }: VerifyProps) {
   const { data: session } = useSession();
   const walletAddress = session?.user?.walletAddress;
 
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [buttonState, setButtonState] = useState<
+    'pending' | 'success' | 'failed' | undefined
+  >(undefined);
+
+  const [whichVerification, setWhichVerification] = useState<VerificationLevel>(
+    VerificationLevel.Device,
+  );
 
   const handleVerificationClick = async () => {
-    setIsVerifying(true);
-    setVerificationError(null);
-
-    if (!MiniKit.isInstalled()) {
-      setVerificationError('World App no está instalado.');
-      setIsVerifying(false);
-      return;
-    }
+    setButtonState('pending');
+    setWhichVerification(VerificationLevel.Device);
 
     try {
-      const { finalPayload } = await MiniKit.commandsAsync.verify({
+      const result = await MiniKit.commandsAsync.verify({
         action: 'testing-action',
-        signal: walletAddress,
         verification_level: VerificationLevel.Device,
+        signal: walletAddress,
       });
 
-      if (finalPayload.status === 'error') {
-        throw new Error(finalPayload.error_code ?? 'Verificación cancelada en MiniKit.');
+      if (result.finalPayload.status === 'error') {
+        throw new Error(result.finalPayload.error_code ?? 'Verificación cancelada en MiniKit.');
       }
 
       const verifyResponse = await fetch('/api/verify-proof', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          payload: finalPayload as ISuccessResult,
+          payload: result.finalPayload as ISuccessResult,
           action: 'testing-action',
           signal: walletAddress,
         }),
@@ -69,26 +68,29 @@ export function Verify({ onSuccess }: VerifyProps) {
 
       const verifyResponseJson = await verifyResponse.json();
 
-      if (verifyResponse.status === 200 && verifyResponseJson.success) {
+      if (verifyResponse.status === 200 && verifyResponseJson.verifyRes?.success) {
+        setButtonState('success');
         onSuccess();
       } else {
-        throw new Error(verifyResponseJson.verifyRes?.detail || 'La verificación de la prueba falló.');
+        setButtonState('failed');
+        setTimeout(() => setButtonState(undefined), 2000);
       }
-    } catch (err: any) {
-      console.error("Error durante la verificación:", err);
-      setVerificationError(err.message || "Ocurrió un error inesperado.");
-    } finally {
-      setIsVerifying(false);
+    } catch (error: any) {
+      console.error("Error durante la verificación:", error);
+      setButtonState('failed');
+      setTimeout(() => setButtonState(undefined), 2000);
     }
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center text-center mt-4">
+    <div className="w-full max-w-sm flex flex-col items-center text-center mt-4
+      bg-gradient-to-br from-black to-yellow-500/80 rounded-lg p-6 shadow-lg"
+    >
       <p className="mb-4 text-slate-300">Verifica y comenza a ganar.</p>
-      <VerifyButton onClick={handleVerificationClick} disabled={isVerifying} />
+      <VerifyButton onClick={handleVerificationClick} disabled={buttonState === 'pending'} />
       <div className="h-10 mt-2 text-sm flex flex-col items-center justify-center">
-        {isVerifying && <p>Abriendo World App para verificar...</p>}
-        {verificationError && <p className="text-red-400">{verificationError}</p>}
+        {buttonState === 'pending' && <p>Abriendo World App para verificar...</p>}
+        {buttonState === 'failed' && <p className="text-red-400">Error al verificar, intenta nuevamente.</p>}
       </div>
     </div>
   );

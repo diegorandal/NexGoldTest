@@ -84,7 +84,7 @@ export function Verify({ onSuccess }: VerifyProps) {
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center text-center mt-4">
-      <p className="mb-4 text-slate-300">Debes verificar tu humanidad para poder acceder a la aplicación.</p>
+      <p className="mb-4 text-slate-300">Verifica y comenza a ganar.</p>
       <VerifyButton onClick={handleVerificationClick} disabled={isVerifying} />
       <div className="h-10 mt-2 text-sm flex flex-col items-center justify-center">
         {isVerifying && <p>Abriendo World App para verificar...</p>}

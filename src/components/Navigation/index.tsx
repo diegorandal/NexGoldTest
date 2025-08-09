@@ -12,7 +12,7 @@ import { useState } from 'react';
  */
 
 export const Navigation = () => {
-  const [value, setValue] = useState('home');
+  const [value, setValue] = useState('Home');
 
   return (
     <Tabs value={value} onValueChange={setValue}>

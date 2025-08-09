@@ -134,7 +134,7 @@ const VerifyComponent: React.FC<{ onSuccess: () => void; }> = ({ onSuccess }) =>
         setVerificationError(null);
         try {
             const { finalPayload } = await MiniKit.commandsAsync.verify({
-                action: 'nexg-login',
+                action: 'testingaction',
                 signal: walletAddress,
                 verification_level: VerificationLevel.Orb,
             });
@@ -247,11 +247,9 @@ function AppFlowManager() {
         );
     }
    
-    /*
-    if (!session.user.isHumanVerified) {
+    if (!session.user.username) {
         return <VerifyComponent onSuccess={handleVerificationSuccess} />;
     }
-    */
 
     return <MainAppContent />;
 }

@@ -62,7 +62,7 @@ export function Verify({ onSuccess }: VerifyProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           payload: finalPayload as ISuccessResult,
-          action: 'testing-action',
+          action: 'testingaction',
           signal: walletAddress,
         }),
       });

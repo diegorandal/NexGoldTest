@@ -21,7 +21,7 @@ export default function CustomLoginPage() {
   const router = useRouter();
 
   const [uiState, setUiState] = useState<'loading' | 'verifying' | 'manual_login'>('loading');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage] = useState('');
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -31,11 +31,12 @@ export default function CustomLoginPage() {
 
     if (status === 'unauthenticated' && uiState === 'loading') {
       const autoSignIn = async () => {
+        /*
         try {
           const nonceRes = await fetch('/api/get-nonce');
           if (!nonceRes.ok) throw new Error("Error del servidor al obtener nonce.");
           const { nonce, signedNonce } = await nonceRes.json();
-
+        
           const result = await MiniKit.commandsAsync.solvePoW_and_proveOwnership(nonce);
           if (!result.finalPayload) throw new Error("La prueba de propiedad falló.");
 
@@ -55,7 +56,10 @@ export default function CustomLoginPage() {
           setErrorMessage("No se pudo conectar automáticamente. Por favor, conéctate manualmente.");
           setUiState('manual_login');
         }
+        */
+
       };
+      
       autoSignIn();
     }
   }, [status, uiState]);
@@ -83,18 +87,20 @@ export default function CustomLoginPage() {
             <p className="text-gray-300">
               Bienvenidos.
             </p>
-            <AuthButton
-              onConnectSuccess={handleConnectSuccess}
-              className="bg-black rounded-lg p-4 border border-transparent hover:border-cyan-400 transition-all duration-300 group"
-            >
-              <span 
-                className="text-xl font-bold text-white transition-all duration-300 group-hover:text-cyan-300"
-                style={neonTextStyle}
-              >
-                Conectar Wallet
-              </span>
-            </AuthButton>
-          </>
+            <AuthButton />
+            { /*
+                onConnectSuccess={handleConnectSuccess}
+                className="bg-black rounded-lg p-4 border border-transparent hover:border-cyan-400 transition-all duration-300 group"
+                >
+                <span 
+                    className="text-xl font-bold text-white transition-all duration-300 group-hover:text-cyan-300"
+                    style={neonTextStyle}
+                >
+                    Conectar Wallet
+                </span>
+                </AuthButton>
+            */}
+            </>
         );
     }
   };

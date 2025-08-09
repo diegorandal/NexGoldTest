@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, FC, useCallback } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { Abi, parseEther } from 'viem';
 import { Marble } from '@worldcoin/mini-apps-ui-kit-react';
 import { useSession, signOut } from 'next-auth/react';
@@ -11,17 +11,11 @@ const TOKEN_ABI: Abi = [
     {"constant": true, "inputs": [{"name": "_owner", "type": "address"}], "name": "balanceOf", "outputs": [{"name": "balance", "type": "uint256"}], "type": "function", "stateMutability": "view"},
     {"constant": false, "inputs": [{"name": "_spender", "type": "address"},{"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function", "stateMutability": "nonpayable"}
 ];
-const STAKING_ABI: Abi = [
-    {"constant": false, "inputs": [{"name": "_amount", "type": "uint256"}], "name": "stake", "outputs": [], "type": "function", "stateMutability": "nonpayable"},
-    {"constant": false, "inputs": [{"name": "_amount", "type": "uint256"}], "name": "unstake", "outputs": [], "type": "function", "stateMutability": "nonpayable"},
-    {"constant": false, "inputs": [], "name": "claimRewards", "outputs": [], "type": "function", "stateMutability": "nonpayable"}
-];
 const MINING_ABI: Abi = [
     {"constant": false, "inputs": [], "name": "claim", "outputs": [], "type": "function", "stateMutability": "nonpayable"}
 ];
 
 const TOKEN_CONTRACT_ADDRESS = '0x...';
-const STAKING_CONTRACT_ADDRESS = '0x...';
 const MINING_CONTRACT_ADDRESS = '0x...';
 
 type SectionId = 'dashboard' | 'staking' | 'mining';
@@ -154,7 +148,7 @@ const StakingSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 
 const MiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     const { sendTransaction, transactionState, isConfirming, transactionError } = useMiniKitTransaction();
-    const [minedAmount, setMinedAmount] = useState(0);
+    const [minedAmount] = useState(0);
     const [isMining, setIsMining] = useState(false);
     const [depositAmount, setDepositAmount] = useState('');
     const [poolBalance, setPoolBalance] = useState(10000); 

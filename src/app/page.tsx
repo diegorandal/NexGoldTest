@@ -27,7 +27,7 @@ export default function Page() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white p-4">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-yellow-500 to-yellow-700 text-white p-4">
       {step === 'loading' && <p>Conectando...</p>}
 
       {step === 'login' && <AuthButton />}

@@ -57,7 +57,7 @@ export function Verify({ onSuccess }: VerifyProps) {
         throw new Error(finalPayload.error_code ?? 'Verificación cancelada en MiniKit.');
       }
 
-      const verifyResponse = await fetch('/api/verify', {
+      const verifyResponse = await fetch('/api/verify-proof', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -50,7 +50,7 @@ export function Verify({ onSuccess }: VerifyProps) {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: 'testing-action',
         signal: walletAddress,
-        verification_level: VerificationLevel.Orb,
+        verification_level: VerificationLevel,
       });
 
       if (finalPayload.status === 'error') {

@@ -15,6 +15,8 @@ const NEX_GOLD_STAKING_ADDRESS = '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
 
 const NEX_GOLD_STAKING_ABI = NEX_GOLD_STAKING_ABI_JSON as Abi;
 
+console.log(NEX_GOLD_STAKING_ABI);
+
 const publicClient = createPublicClient({
     chain: worldchain,
     transport: http('https://worldchain-mainnet.g.alchemy.com/public'),

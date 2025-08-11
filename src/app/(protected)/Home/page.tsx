@@ -11,7 +11,7 @@ import { LogOut, Info, Loader, CheckCircle, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import NEX_GOLD_STAKING_ABI_JSON from '@/abi/NEX_GOLD_STAKING_ABI.json'; 
 
-const NEX_GOLD_STAKING_ADDRESS = '0x...';
+const NEX_GOLD_STAKING_ADDRESS = '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
 
 const NEX_GOLD_STAKING_ABI = NEX_GOLD_STAKING_ABI_JSON as Abi;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, FC, useCallback } from 'react';
-import { abi, createPublicClient, http, parseEther, formatEther } from 'viem';
+import { Abi, createPublicClient, http, parseEther, formatEther } from 'viem';
 import { worldchain } from 'viem/chains';
 import { MiniKit } from '@worldcoin/minikit-js';
 import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
@@ -9,6 +9,7 @@ import { Marble } from '@worldcoin/mini-apps-ui-kit-react';
 import { useSession, signOut } from 'next-auth/react';
 import { LogOut, Info, Loader, CheckCircle, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import NEX_GOLD_STAKING_ABI from '@/abi/NEX_GOLD_STAKING_ABI.json'; 
 
 const NEX_GOLD_STAKING_ADDRESS = '0x...';
 const NEX_GOLD_STAKING_ABI: Abi = [

@@ -148,7 +148,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         await sendTransaction({
             transaction: [{
                 to: NEX_GOLD_STAKING_ADDRESS,
-                abi: NEX_GOLD_STAKING_ABI,
+                abi: NEX_GOLD_STAKING_ABI as any,
                 functionName: 'stake',
                 args: [parseEther(amount), worldIdProof.root, worldIdProof.nullifierHash, worldIdProof.proof, permit2Data.permit, permit2Data.signature],
             }]
@@ -161,7 +161,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         await sendTransaction({
             transaction: [{
                 to: NEX_GOLD_STAKING_ADDRESS,
-                abi: NEX_GOLD_STAKING_ABI,
+                abi: NEX_GOLD_STAKING_ABI as any,
                 functionName: 'unstake',
                 args: [parseEther(amount)],
             }]
@@ -172,7 +172,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         await sendTransaction({
             transaction: [{
                 to: NEX_GOLD_STAKING_ADDRESS,
-                abi: NEX_GOLD_STAKING_ABI,
+                abi: NEX_GOLD_STAKING_ABI as any,
                 functionName: 'claimAllRewards',
                 args: [],
             }]

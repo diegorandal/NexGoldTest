@@ -9,9 +9,11 @@ import { Marble } from '@worldcoin/mini-apps-ui-kit-react';
 import { useSession, signOut } from 'next-auth/react';
 import { LogOut, Info, Loader, CheckCircle, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import NEX_GOLD_STAKING_ABI from '@/abi/NEX_GOLD_STAKING_ABI.json'; 
+import NEX_GOLD_STAKING_ABI_JSON from '@/abi/NEX_GOLD_STAKING_ABI.json'; 
 
 const NEX_GOLD_STAKING_ADDRESS = '0x...';
+
+const NEX_GOLD_STAKING_ABI = NEX_GOLD_STAKING_ABI_JSON as Abi;
 
 const publicClient = createPublicClient({
     chain: worldchain,
@@ -107,7 +109,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         try {
             
             const [staker, stakingRewards, miningRewards] = await Promise.all([
-                publicClient.readContract({ address: NEX_GOLD_STAKING_ADDRESS, abi: NEX_GOLD_STAKING_ABI, functionName: 'stakers', args: [session.user.walletAddress],}) as unknown as [bigint, bigint],
+                publicClient.readContract({ address: NEX_GOLD_STAKING_ADDRESS, abi: NEX_GOLD_STAKING_ABI, functionName: 'stakers', args: [session.user.walletAddress],}) as unknown as [bigint, bigint, bigint, bigint],
                 publicClient.readContract({ address: NEX_GOLD_STAKING_ADDRESS, abi: NEX_GOLD_STAKING_ABI, functionName: 'calculateStakingRewards', args: [session.user.walletAddress] }) as unknown as bigint,
                 publicClient.readContract({ address: NEX_GOLD_STAKING_ADDRESS, abi: NEX_GOLD_STAKING_ABI, functionName: 'calculateMiningRewards', args: [session.user.walletAddress] }) as unknown as bigint,
             ]);

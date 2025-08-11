@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, FC, useCallback } from 'react';
 import { Abi, createPublicClient, http, parseEther, formatEther } from 'viem';

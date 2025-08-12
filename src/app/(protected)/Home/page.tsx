@@ -114,22 +114,16 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     });
 
     const fetchContractData = useCallback(async () => {
-        
-        /*
+
         if (!session?.user?.walletAddress) {
             console.log("Wallet address no disponible, adios");
             return;
         } else {
             console.log("Wallet address:", session.user.walletAddress);
         }
-        */
-       
+
         setContractData(prev => ({ ...prev, isLoading: true }));
         try {
-
-            const user = await MiniKit.getUserByUsername(session.user.username);
-            const walletAddress = user.walletAddress;
-            console.log("Wallet address from MiniKit:", walletAddress);
 
             const [staker, stakingRewards, miningRewards] = await Promise.all([
                 publicClient.readContract({ address: NEX_GOLD_STAKING_ADDRESS, abi: NEX_GOLD_STAKING_ABI, functionName: 'stakers', args: [session.user.walletAddress],}) as unknown as [bigint, bigint, bigint, bigint],

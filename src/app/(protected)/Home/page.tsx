@@ -130,11 +130,13 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 
     useEffect(() => {
         fetchContractData();
+        console.log("Contract data en useEffect: ", contractData);
     }, [fetchContractData]);
 
     useEffect(() => {
         if (status === 'success') {
             fetchContractData();
+            console.log("Contract data en useEffect (success): ", contractData);
         }
     }, [status, fetchContractData]);
 

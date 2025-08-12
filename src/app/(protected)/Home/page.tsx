@@ -40,9 +40,13 @@ const useMiniKit = () => {
 
     useEffect(() => {
 
-        console.log("Transaction ID en useEffect42: ", transactionId);
 
-        if (!transactionId) return;
+        if (!transactionId) {
+            console.log("Transaction ID no disponible, adios");
+            return;
+        }
+
+        console.log("Transaction ID:", transactionId);
 
         if (isConfirming) {
             setStatus('pending');
@@ -65,6 +69,7 @@ const useMiniKit = () => {
         try {
             const { finalPayload } = await MiniKit.commandsAsync.sendTransaction(txConfig);
             if (finalPayload.status === 'success') {
+                console.log('Transaction sent successfully:', finalPayload);
                 setTransactionId(finalPayload.transaction_id);
             } else {
                 console.error('Submission failed:', finalPayload);

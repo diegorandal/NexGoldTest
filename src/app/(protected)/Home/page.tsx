@@ -190,6 +190,9 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     };
 
     useEffect(() => {
+        
+        const { data: session } = useSession();
+        
         console.log("Debug llamada al contrato a la antigüita");
         let isMounted = true;
 

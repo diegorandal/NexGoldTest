@@ -114,7 +114,11 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     });
 
     const fetchContractData = useCallback(async () => {
+
         if (!session?.user?.walletAddress) return;
+
+        console.log("Wallet address:", session.user.walletAddress);
+
         setContractData(prev => ({ ...prev, isLoading: true }));
         try {
             
@@ -188,47 +192,6 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             }]
         });
     };
-
-    useEffect(() => {
-        
-        const { data: session } = useSession();
-
-        console.log("Debug llamada al contrato a la antigüita");
-        let isMounted = true;
-
-        async function fetchPrueba() {
-            
-            if (!session?.user?.walletAddress){
-                console.log("Debug lacala walletAddress no disponible");
-                return;
-            } else {
-                console.log("Debug lacala walletAddress:", session.user.walletAddress);
-            }
-
-            try{
-            
-                const user = await MiniKit.getUserByUsername(session.user.username);
-                const walletAddress = user.walletAddress;
-                if (!walletAddress) { return;}
-                const client = createPublicClient({
-                    chain: worldchain,
-                    transport: http('https://worldchain-mainnet.g.alchemy.com/public'),
-                });
-                const raw = await client.readContract({
-                address: NEX_GOLD_STAKING_ADDRESS,
-                abi: NEX_GOLD_STAKING_ABI,
-                functionName: 'calculateMiningRewards',
-                args: [walletAddress],
-                });
-
-                if (isMounted) console.log("Recompensas de Mining (debug):", raw);
-
-            } catch (error) {
-                console.error("Error en fx debug", error);
-            }
-        }
-
-    }, []);
 
     const isProcessing = status === 'pending';
     const isLocked = contractData.lockinEndDate && contractData.lockinEndDate > new Date();

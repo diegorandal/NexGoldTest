@@ -115,9 +115,12 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 
     const fetchContractData = useCallback(async () => {
 
-        if (!session?.user?.walletAddress) return;
-
-        console.log("Wallet address:", session.user.walletAddress);
+        if (!session?.user?.walletAddress) {
+            console.log("Wallet address no disponible, adios");
+            return;
+        } else {
+            console.log("Wallet address:", session.user.walletAddress);
+        }
 
         setContractData(prev => ({ ...prev, isLoading: true }));
         try {

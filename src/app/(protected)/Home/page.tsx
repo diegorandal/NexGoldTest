@@ -39,6 +39,9 @@ const useMiniKit = () => {
     });
 
     useEffect(() => {
+
+        console.log("Transaction ID en useEffect42: ", transactionId);
+
         if (!transactionId) return;
 
         if (isConfirming) {

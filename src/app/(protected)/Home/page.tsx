@@ -189,6 +189,10 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         });
     };
 
+    useEffect(() => {
+        console.log("Debug");
+    }, []);
+
     const isProcessing = status === 'pending';
     const isLocked = contractData.lockinEndDate && contractData.lockinEndDate > new Date();
 

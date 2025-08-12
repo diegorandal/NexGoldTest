@@ -98,9 +98,9 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     const { data: session } = useSession();
 
     const [contractData, setContractData] = useState({
-        stakedBalance: '0.0',
-        stakingRewards: '0.0',
-        miningRewards: '0.0',
+        stakedBalance: '1.0',
+        stakingRewards: '1.0',
+        miningRewards: '1.0',
         lockinEndDate: null as Date | null,
         isLoading: true,
     });

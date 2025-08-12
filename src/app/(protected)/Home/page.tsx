@@ -34,7 +34,7 @@ const useMiniKit = () => {
         error: txError,
     } = useWaitForTransactionReceipt({
         client: publicClient,
-        appConfig: { app_id: process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}` },
+        appConfig: { app_id: process.env.NEXT_PUBLIC_APP_ID as `app_${string}` },
         transactionId: transactionId,
     });
 

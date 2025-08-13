@@ -1,45 +1,31 @@
-"use client"
+'use client'
 
 import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { MiniKit } from '@worldcoin/minikit-js'
-
-// --- Importaciones de VIEM ---
 import { createPublicClient, http, parseEther, type Address } from "viem"
-// ¡Importante! Cambia 'mainnet' por la red que estés usando (e.g., polygon, optimism)
 import { mainnet } from 'viem/chains' 
-
-// --- ABIs ---
-// Tu ABI del contrato de Staking
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
-// El ABI de Permit2 que solo contiene la función 'nonce'
 import PERMIT2_ABI from "@/abi/Permit2.json" 
-
-// --- Componentes y Hooks personalizados ---
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 
-// --- Direcciones de Contratos ---
 const NEX_GOLD_STAKING_ADDRESS: Address = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41"
 const NEX_GOLD_TOKEN_ADDRESS: Address = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
 const PERMIT2_ADDRESS: Address = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
-
-// --- Cliente Público de VIEM ---
-// Se crea fuera del componente para evitar que se regenere en cada render.
-// Para producción, es recomendable usar un proveedor de RPC como Alchemy o Infura: http('https://eth-mainnet.g.alchemy.com/v2/TU_API_KEY')
+const ALCHEMY_API_KEY = 'Eqy_Wm0yb2zOSE8_C3_AP'
 const publicClient = createPublicClient({
   chain: mainnet,
-  transport: http(),
+  transport: http('https://worldchain-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}'),
 })
 
 const StakingAndMiningSection: FC<{
   onBack: () => void
 }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
-  // Asumo que tu hook `useMiniKit` te da acceso a la dirección del usuario y al estado de la tx.
   const { userAddress, sendTransaction, status, error } = useMiniKit()
   const { contractData, fetchContractData, isLocked } = useContractData()
 
@@ -52,8 +38,6 @@ const StakingAndMiningSection: FC<{
     }
   }, [status, fetchContractData])
 
-  // Función para leer el nonce actual del usuario desde el contrato Permit2.
-  // Es crucial para la seguridad, para evitar que una firma se use dos veces.
   const getPermit2Nonce = async (owner: Address): Promise<number> => {
     try {
       const nonce = await publicClient.readContract({
@@ -65,13 +49,11 @@ const StakingAndMiningSection: FC<{
       return Number(nonce)
     } catch (e) {
       console.error("Error al obtener el nonce de Permit2:", e)
-      // Este fallback es inseguro para producción, pero evita que la app se rompa.
       return Date.now()
     }
   }
 
   const handleStake = async () => {
-    // 1. Validaciones iniciales
     const value = Number.parseFloat(amount)
     if (isNaN(value) || value <= 0) {
       alert("Por favor, introduce una cantidad válida.")
@@ -82,7 +64,6 @@ const StakingAndMiningSection: FC<{
       return
     }
 
-    // 2. Obtener la prueba de World ID desde el sessionStorage
     const storedProof = sessionStorage.getItem("worldIdProof")
     if (!storedProof || storedProof === "undefined" || storedProof === "null") {
       alert("No se encontraron datos de verificación de World ID. Por favor, verifica tu identidad primero.")
@@ -98,24 +79,17 @@ const StakingAndMiningSection: FC<{
     const amountWei = parseEther(amount)
     const currentNonce = await getPermit2Nonce(userAddress)
 
-    // 3. Definir el objeto del permiso que MiniKit le pedirá al usuario que firme
     const permitToSign = {
       permitted: {
-        token: NEX_GOLD_TOKEN_ADDRESS, // El token a stakear
+        token: NEX_GOLD_TOKEN_ADDRESS,
         amount: amountWei,
       },
       nonce: currentNonce,
-      deadline: Math.floor((Date.now() + 30 * 60 * 1000) / 1000), // Válido por 30 mins
-      // El 'spender' es la dirección que tendrá permiso para usar los tokens.
-      // Debe ser tu contrato de staking.
+      deadline: Math.floor((Date.now() + 30 * 60 * 1000) / 1000),
       spender: NEX_GOLD_STAKING_ADDRESS,
     };
 
     try {
-      // 4. Llamar a MiniKit. Él se encarga de:
-      //    a. Pedir al usuario que firme el objeto `permitToSign`.
-      //    b. Reemplazar 'PERMIT2_SIGNATURE_PLACEHOLDER_0' con la firma real.
-      //    c. Enviar la transacción a tu contrato `stake`.
       await MiniKit.commandsAsync.sendTransaction({
         transaction: [
           {
@@ -341,4 +315,4 @@ export default function HomePage() {
   }
 
   return null
-}
+      }

@@ -13,9 +13,9 @@ import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/
 import { useMiniKit } from "@/hooks/use-minikit";
 import { useContractData } from "@/hooks/use-contract-data";
 
-const NEX_GOLD_STAKING_ADDRESS: Address = '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
-const NEX_GOLD_TOKEN_ADDRESS: Address = '0xA3502E3348B549ba45Af8726Ee316b490f308dDC';
-const PERMIT2_ADDRESS: Address = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
+const NEX_GOLD_STAKING_ADDRESS: '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
+const NEX_GOLD_TOKEN_ADDRESS= '0xA3502E3348B549ba45Af8726Ee316b490f308dDC';
+const PERMIT2_ADDRESS: '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 
 const publicClient = createPublicClient({

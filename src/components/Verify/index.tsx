@@ -70,7 +70,7 @@ export function Verify({ onSuccess }: VerifyProps) {
 
       if (verifyResponse.status === 200 && verifyResponseJson.verifyRes?.success) {
         setButtonState('success');
-        //onSuccess();
+        onSuccess(verifyResponseJson.verifyRes.proof);
       } else {
         setButtonState('failed');
         setTimeout(() => setButtonState(undefined), 2000);

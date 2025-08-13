@@ -1,21 +1,21 @@
 'use client'
 
-import { useState, useEffect, type FC } from "react"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
-import MiniKit from '@worldcoin/minikit-js';
-import { createPublicClient, http, parseEther, type Address } from "viem"
-import { worldchain } from 'viem/chains'
-import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
-import PERMIT2_ABI from "@/abi/Permit2.json" 
-import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
-import { useMiniKit } from "@/hooks/use-minikit"
-import { useContractData } from "@/hooks/use-contract-data"
+import { useState, useEffect, type FC } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Info, Loader, CheckCircle, XCircle } from 'lucide-react';
+import { MiniKit } from "@worldcoin/minikit-js";
+import { createPublicClient, http, parseEther, type Address } from "viem";
+import { worldchain } from 'viem/chains';
+import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json";
+import PERMIT2_ABI from "@/abi/Permit2.json";
+import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components";
+import { useMiniKit } from "@/hooks/use-minikit";
+import { useContractData } from "@/hooks/use-contract-data";
 
-const NEX_GOLD_STAKING_ADDRESS: Address = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41"
-const NEX_GOLD_TOKEN_ADDRESS: Address = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-const PERMIT2_ADDRESS: Address = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+const NEX_GOLD_STAKING_ADDRESS: Address = '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
+const NEX_GOLD_TOKEN_ADDRESS: Address = '0xA3502E3348B549ba45Af8726Ee316b490f308dDC';
+const PERMIT2_ADDRESS: Address = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 
 const publicClient = createPublicClient({

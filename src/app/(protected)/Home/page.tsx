@@ -4,7 +4,7 @@ import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
-import { MiniKit } from '@worldcoin/minikit-js';
+import MiniKit from '@worldcoin/minikit-js';
 import { createPublicClient, http, parseEther, type Address } from "viem"
 import { worldchain } from 'viem/chains'
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"

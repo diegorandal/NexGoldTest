@@ -1,47 +1,22 @@
-'use client'
+"use client"
 
-import { useState, useEffect, type FC } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Info, Loader, CheckCircle, XCircle } from 'lucide-react';
-import { MiniKit } from "@worldcoin/minikit-js";
-import { createPublicClient, http, parseEther, type Address, defineChain } from "viem";
-import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json";
-import PERMIT2_ABI from "@/abi/Permit2.json";
-import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components";
-import { useMiniKit } from "@/hooks/use-minikit";
-import { useContractData } from "@/hooks/use-contract-data";
+import { useState, useEffect, type FC } from "react"
+import { parseEther } from "viem"
+import { useSession } from "next-auth/react"
+import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
+import { useRouter } from "next/navigation"
+import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
+import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
+import { useMiniKit } from "@/hooks/use-minikit"
+import { useContractData } from "@/hooks/use-contract-data"
 
-// --- CORRECCIÓN 1: Sintaxis de las constantes ---
-// Se ha añadido el operador '=' y el tipo 'Address' a todas.
-const NEX_GOLD_STAKING_ADDRESS: Address = '0x3c8acbee00a0304842a48293b6c1da63e3c6bc41';
-const NEX_GOLD_TOKEN_ADDRESS: Address = '0xA3502E3348B549ba45Af8726Ee316b490f308dDC';
-const PERMIT2_ADDRESS: Address = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
-
-// --- CORRECCIÓN 2: Definición manual de Worldchain ---
-// 'viem/chains' no exporta 'worldchain', así que la definimos aquí.
-const worldchain = defineChain({
-  id: 444444,
-  name: 'World Chain',
-  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-  rpcUrls: {
-    default: { http: ['https://worldchain-mainnet.g.alchemy.com/public'] },
-  },
-  blockExplorers: {
-    default: { name: 'Worldscan', url: 'https://worldscan.io' },
-  },
-});
-
-const publicClient = createPublicClient({
-  chain: worldchain,
-  transport: http(), // No es necesario pasar la URL aquí si ya está en la definición de la cadena
-})
+const NEX_GOLD_STAKING_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41"
 
 const StakingAndMiningSection: FC<{
   onBack: () => void
 }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
-  const { userAddress, sendTransaction, status, error } = useMiniKit()
+  const { sendTransaction, status, error } = useMiniKit()
   const { contractData, fetchContractData, isLocked } = useContractData()
 
   const isProcessing = status === "pending"
@@ -49,89 +24,73 @@ const StakingAndMiningSection: FC<{
   useEffect(() => {
     if (status === "success") {
       fetchContractData()
-      setAmount("")
     }
   }, [status, fetchContractData])
 
-  const getPermit2Nonce = async (owner: Address): Promise<number> => {
-    try {
-      const nonce = await publicClient.readContract({
-        address: PERMIT2_ADDRESS,
-        abi: PERMIT2_ABI,
-        functionName: 'nonce',
-        args: [owner, NEX_GOLD_TOKEN_ADDRESS, 0],
-      })
-      return Number(nonce)
-    } catch (e) {
-      console.error("Error al obtener el nonce de Permit2:", e)
-      return Date.now()
-    }
-  }
-
   const handleStake = async () => {
     const value = Number.parseFloat(amount)
-    if (isNaN(value) || value <= 0) {
-      alert("Por favor, introduce una cantidad válida.")
-      return
-    }
-    if (!userAddress) {
-      alert("No se pudo encontrar la dirección del usuario. Por favor, vuelve a conectar tu billetera.")
+    if (isNaN(value) || value <= 0) return
+
+    const storedProof = sessionStorage.getItem("worldIdProof")
+    console.log("Stored Proof:", storedProof)
+    if (!storedProof || storedProof === "undefined" || storedProof === "null") {
+      console.error("No hay datos de verificación válidos")
       return
     }
 
-    const storedProof = sessionStorage.getItem("worldIdProof")
-    if (!storedProof || storedProof === "undefined" || storedProof === "null") {
-      alert("No se encontraron datos de verificación de World ID. Por favor, verifica tu identidad primero.")
+    let verificationProof
+    try {
+      verificationProof = JSON.parse(storedProof)
+    } catch (error) {
+      console.error("Error al parsear datos de verificación:", error)
       return
     }
-    const verificationProof = JSON.parse(storedProof)
+
+    if (
+      !verificationProof ||
+      !verificationProof.merkle_root ||
+      !verificationProof.nullifier_hash ||
+      !verificationProof.proof
+    ) {
+      console.error("Datos de verificación incompletos")
+      return
+    }
+
     const worldIdProof = {
       root: verificationProof.merkle_root,
       nullifierHash: verificationProof.nullifier_hash,
       proof: verificationProof.proof,
     }
 
-    const amountWei = parseEther(amount)
-    const currentNonce = await getPermit2Nonce(userAddress)
-
-    const permitToSign = {
-      permitted: {
-        token: NEX_GOLD_TOKEN_ADDRESS,
-        amount: amountWei,
+    const permit2Data = {
+      permit: {
+        permitted: {
+          token: "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41",
+          amount: parseEther(amount),
+        },
+        nonce: 0,
+        deadline: Math.floor(Date.now() / 1000) + 3600,
       },
-      nonce: currentNonce,
-      deadline: Math.floor((Date.now() + 30 * 60 * 1000) / 1000),
-      spender: NEX_GOLD_STAKING_ADDRESS,
-    };
-
-    try {
-      await MiniKit.commandsAsync.sendTransaction({
-        transaction: [
-          {
-            to: NEX_GOLD_STAKING_ADDRESS,
-            abi: NEX_GOLD_STAKING_ABI as any,
-            functionName: 'stake',
-            args: [
-              amountWei,
-              worldIdProof.root,
-              worldIdProof.nullifierHash,
-              worldIdProof.proof,
-              { 
-                permitted: permitToSign.permitted,
-                nonce: permitToSign.nonce,
-                deadline: permitToSign.deadline,
-              },
-              'PERMIT2_SIGNATURE_PLACEHOLDER_0', 
-            ],
-          },
-        ],
-        permit2: [
-          permitToSign,
-        ],
-      });
-    } catch (e) {
-      console.error("Error durante el proceso de staking con MiniKit:", e)
+      signature: "0x",
     }
+
+    await sendTransaction({
+      transaction: [
+        {
+          to: NEX_GOLD_STAKING_ADDRESS,
+          abi: NEX_GOLD_STAKING_ABI as any,
+          functionName: "stake",
+          args: [
+            parseEther(amount),
+            worldIdProof.root,
+            worldIdProof.nullifierHash,
+            worldIdProof.proof,
+            permit2Data.permit,
+            permit2Data.signature,
+          ],
+        },
+      ],
+    })
   }
 
   const handleUnstake = async () => {

@@ -32,6 +32,7 @@ const StakingAndMiningSection: FC<{
     if (isNaN(value) || value <= 0) return
 
     const storedProof = sessionStorage.getItem("worldIdProof")
+    console.log("Stored Proof:", storedProof)
     if (!storedProof || storedProof === "undefined" || storedProof === "null") {
       console.error("No hay datos de verificación válidos")
       return

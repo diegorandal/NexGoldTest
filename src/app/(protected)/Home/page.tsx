@@ -32,9 +32,29 @@ const StakingAndMiningSection: FC<{
     if (isNaN(value) || value <= 0) return
 
     const storedProof = sessionStorage.getItem("worldIdProof")
-    if (!storedProof) return
+    if (!storedProof || storedProof === "undefined" || storedProof === "null") {
+      console.error("No hay datos de verificación válidos")
+      return
+    }
 
-    const verificationProof = JSON.parse(storedProof)
+    let verificationProof
+    try {
+      verificationProof = JSON.parse(storedProof)
+    } catch (error) {
+      console.error("Error al parsear datos de verificación:", error)
+      return
+    }
+
+    if (
+      !verificationProof ||
+      !verificationProof.merkle_root ||
+      !verificationProof.nullifier_hash ||
+      !verificationProof.proof
+    ) {
+      console.error("Datos de verificación incompletos")
+      return
+    }
+
     const worldIdProof = {
       root: verificationProof.merkle_root,
       nullifierHash: verificationProof.nullifier_hash,

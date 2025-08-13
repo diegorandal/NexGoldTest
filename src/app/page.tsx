@@ -34,8 +34,6 @@ export default function Page() {
 
       {step === "login" && <AuthButton />}
 
-      {/*step === "verify" && <Verify onSuccess={() => {}} />*/}
-
       {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
 
     </main>

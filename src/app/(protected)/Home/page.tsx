@@ -20,7 +20,7 @@ const PERMIT2_ADDRESS: Address = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
 
 const publicClient = createPublicClient({
   chain: worldchain,
-  transport: http('https://worldchain-mainnet.g.alchemy.com/v2/Eqy_Wm0yb2zOSE8_C3_AP'),
+  transport: http("https://worldchain-mainnet.g.alchemy.com/public"),
 })
 
 const StakingAndMiningSection: FC<{

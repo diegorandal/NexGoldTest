@@ -19,6 +19,8 @@ const StakingAndMiningSection: FC<{
   const [amount, setAmount] = useState("")
   const { sendTransaction, status, error } = useMiniKit()
   const { contractData, fetchContractData, isLocked } = useContractData()
+  
+  const session = useSession();
 
   const isProcessing = status === "pending"
 
@@ -68,7 +70,7 @@ const StakingAndMiningSection: FC<{
     const deadline = now + 180;
     const stakeAmount = value.toString();
 
-    const walletAddress = sessionStorage.getItem("walletAddress");
+    const walletAddress = session?.data?.user?.walletAddress;
 
     console.log("user address:", walletAddress);
 

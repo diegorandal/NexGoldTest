@@ -88,7 +88,7 @@ const StakingAndMiningSection: FC<{
         ],
       }],
     })
-  }
+}
 
   const handleUnstake = async () => {
     const value = Number.parseFloat(amount)

@@ -52,9 +52,11 @@ export const useMiniKit = () => {
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction(txConfig)
       if (finalPayload.status === "success") {
         setTransactionId(finalPayload.transaction_id)
+        console.log("Transacción enviada:", finalPayload)
       } else {
         setError("La transacción no pudo ser enviada.")
         setStatus("error")
+        console.error("Error en transacción:", finalPayload)
       }
     } catch (err: any) {
       console.error("Error sending transaction:", err)

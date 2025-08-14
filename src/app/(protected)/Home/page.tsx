@@ -194,7 +194,8 @@ const StakingAndMiningSection: FC<{
 
 function MainAppContent() {
   const [activeSection, setActiveSection] = useState<"dashboard" | "staking">("dashboard")
-  const { address } = useMiniKit(); 
+  const { data: session } = useSession();
+  const address = session?.user?.walletAddress ?? null;
 
   const renderSection = () => {
     const goBack = () => setActiveSection("dashboard")
@@ -215,7 +216,7 @@ function MainAppContent() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <UserInfo address={address} /> 
+        <UserInfo /> 
       </div>
       <main>{renderSection()}</main>
     </div>

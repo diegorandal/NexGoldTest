@@ -29,6 +29,7 @@ const StakingAndMiningSection: FC<{
     }
   }, [status, fetchContractData])
 
+
   const handleStake = async () => {
     const value = Number.parseFloat(amount)
     if (isNaN(value) || value <= 0) return
@@ -84,11 +85,12 @@ const StakingAndMiningSection: FC<{
             spender: NEX_GOLD_STAKING_ADDRESS,
             sigDeadline: deadline,
           },
-          'PERMIT2_SIGNATURE_PLACEHOLDER_0',
         ],
       }],
     })
-}
+  }
+
+  
 
   const handleUnstake = async () => {
     const value = Number.parseFloat(amount)

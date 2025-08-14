@@ -80,9 +80,12 @@ const StakingAndMiningSection: FC<{
         {
           address: NEX_GOLD_STAKING_ADDRESS,
           abi: NEX_GOLD_STAKING_ABI,
-          functionName: "stake2",
+          functionName: "stake",
           args: [
             stakeAmount,
+            worldIdProof.root,
+            worldIdProof.nullifierHash,
+            worldIdProof.proof,
             [[NEX_GOLD_ADDRESS, stakeAmount], nonce, deadline],
             [NEX_GOLD_STAKING_ADDRESS, stakeAmount],
             walletAddress,

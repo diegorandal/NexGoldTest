@@ -68,7 +68,7 @@ const StakingAndMiningSection: FC<{
     const nonce = Date.now();
     const now = Math.floor(Date.now() / 1000);
     const deadline = now + 180;
-    const stakeAmount = value.toString();
+    const stakeAmount = '1000000000000000000'
 
     const walletAddress = session?.data?.user?.walletAddress;
 

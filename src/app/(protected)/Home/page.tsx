@@ -10,8 +10,8 @@ import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
-const NEX_GOLD_STAKING_ADDRESS = "0x9f656dcf92edc4cb61e0df124f5b78e1dc734e24"
-const NEX_GOLD_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41" // Dirección del token NEX GOLD
+const NEX_GOLD_STAKING_ADDRESS = "0xf580dd0d83c8a7d8c05d549c2350ccf8747800ea"
+const NEX_GOLD_ADDRESS = "0xcd1E32B86953D79a6AC58e813D2EA7a1790cAb63" // Dirección del token NEX GOLD
 
 const StakingAndMiningSection: FC<{
   onBack: () => void

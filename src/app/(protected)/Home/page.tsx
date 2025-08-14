@@ -73,6 +73,7 @@ const StakingAndMiningSection: FC<{
     const walletAddress = session?.data?.user?.walletAddress;
 
     console.log("user address:", walletAddress);
+    console.log("amount:", stakeAmount);
 
     await sendTransaction({
       transaction: [

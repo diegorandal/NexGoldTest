@@ -6,11 +6,13 @@ import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
+//import NEX_GOLD_ABI from "@/abi/nexgoldABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 
 const NEX_GOLD_STAKING_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41"
+const NEX_GOLD_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41" // Dirección del token NEX GOLD
 
 const StakingAndMiningSection: FC<{
   onBack: () => void
@@ -61,33 +63,39 @@ const StakingAndMiningSection: FC<{
       nullifierHash: verificationProof.nullifier_hash,
       proof: verificationProof.proof,
     }
+    
+    const nonce = Date.now();
+    const now = Math.floor(Date.now() / 1000);
+    const deadline = now + 180;
+    const stakeAmount = value.toString();
+    const address = verificationProof.address;
 
-    const permit2Data = {
-      permit: {
-        permitted: {
-          token: "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41",
-          amount: parseEther(amount),
-        },
-        nonce: 0,
-        deadline: Math.floor(Date.now() / 1000) + 3600,
-      },
-      signature: "0x",
-    }
+    console.log("World ID Proof:", verificationProof.address);
 
     await sendTransaction({
       transaction: [
         {
-          to: NEX_GOLD_STAKING_ADDRESS,
-          abi: NEX_GOLD_STAKING_ABI as any,
+          address: NEX_GOLD_STAKING_ADDRESS,
+          abi: NEX_GOLD_STAKING_ABI,
           functionName: "stake",
           args: [
-            parseEther(amount),
+            stakeAmount,
             worldIdProof.root,
             worldIdProof.nullifierHash,
             worldIdProof.proof,
-            permit2Data.permit,
-            permit2Data.signature,
+            [[NEX_GOLD_ADDRESS, stakeAmount], nonce, deadline],
+            [NEX_GOLD_STAKING_ADDRESS, stakeAmount],
+            address,
+            'PERMIT2_SIGNATURE_PLACEHOLDER_0',
           ],
+        },
+      ], 
+      permit2: [
+        {
+          permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmount },
+          nonce: nonce.toString(),
+          deadline: deadline.toString(),
+          spender: NEX_GOLD_STAKING_ADDRESS,
         },
       ],
     })

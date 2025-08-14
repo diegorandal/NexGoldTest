@@ -10,8 +10,6 @@ import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
-import { MiniKit } from '@worldcoin/minikit-js';
-const { data: session } = useSession();
 const NEX_GOLD_STAKING_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41"
 const NEX_GOLD_ADDRESS = "0x3c8acbee00a0304842a48293b6c1da63e3c6bc41" // Dirección del token NEX GOLD
 
@@ -70,12 +68,7 @@ const StakingAndMiningSection: FC<{
     const deadline = now + 180;
     const stakeAmount = value.toString();
 
-    //Hice todo este quilombo para obtener la dirección de la wallet, perdon Walter
-    if (!session?.user?.username) {
-        return;
-    }
-    const user = await MiniKit.getUserByUsername(session.user.username);
-    const walletAddress = user.walletAddress;
+    const walletAddress = sessionStorage.getItem("walletAddress");
 
     console.log("user address:", walletAddress);
 

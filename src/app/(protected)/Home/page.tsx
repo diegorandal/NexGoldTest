@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, type FC } from "react"
-import { parseEther, decodeAbiParameters } from "viem";
+import { createPublicClient, http, decodeAbiParameters, parseEther } from "viem";
+import { worldchain } from "viem/chains";
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
@@ -47,6 +48,38 @@ const handleStake = async () => {
 
   if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
 
+  const nullifierHash = verificationProof.nullifier_hash;
+
+
+  try {
+    console.log("Verificando si el nulificador ya fue usado:", nullifierHash);
+    
+  
+    const publicClient = createPublicClient({
+      chain: worldchain,
+      transport: http("https://worldchain-mainnet.g.alchemy.com/public"),
+    });
+
+    const isNullifierUsed = await publicClient.readContract({
+      address: NEX_GOLD_STAKING_ADDRESS,
+      abi: NEX_GOLD_STAKING_ABI,
+      functionName: 'nullifierHashes',
+      args: [nullifierHash]
+    });
+
+    if (isNullifierUsed) {
+      console.error("Error de Nulificador: Esta prueba de World ID ya fue utilizada. Por favor, verifica tu identidad de nuevo.");
+  
+      sessionStorage.removeItem("worldIdProof");
+      return;
+    } else {
+      console.log("Nulificador válido. Procediendo con el stake...");
+    }
+  } catch (e) {
+    console.error("Error al verificar el nulificador:", e);
+    return;
+  }
+
   const decodedProof = decodeAbiParameters(
     [{ type: 'uint256[8]' }],
     verificationProof.proof
@@ -54,7 +87,7 @@ const handleStake = async () => {
 
   const worldIdProof = {
     root: verificationProof.merkle_root,
-    nullifierHash: verificationProof.nullifier_hash,
+    nullifierHash: nullifierHash,
     proof: decodedProof,
   };
 

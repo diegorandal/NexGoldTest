@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, type FC } from "react"
-import { parseEther } from "viem"
+import { parseEther, decodeAbiParameters } from "viem";
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
@@ -29,14 +29,14 @@ const StakingAndMiningSection: FC<{
     }
   }, [status, fetchContractData])
 
-  const handleStake = async () => {
+const handleStake = async () => {
   const value = Number.parseFloat(amount);
   if (isNaN(value) || value <= 0) return;
 
   if (!walletAddress) return;
 
   const storedProof = sessionStorage.getItem("worldIdProof");
-  if (!storedProof || storedProof === "undefined" || storedProof === "null") return;
+  if (!storedProof) return;
 
   let verificationProof;
   try {
@@ -47,10 +47,18 @@ const StakingAndMiningSection: FC<{
 
   if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
 
+  // --- INICIO DE LA CORRECCIÓN ---
+  // Decodificamos el `proof` de un solo string a un array de 8 uint256
+  const decodedProof = decodeAbiParameters(
+    [{ type: 'uint256[8]' }],
+    verificationProof.proof
+  )[0];
+  // --- FIN DE LA CORRECCIÓN ---
+
   const worldIdProof = {
     root: verificationProof.merkle_root,
     nullifierHash: verificationProof.nullifier_hash,
-    proof: verificationProof.proof,
+    proof: decodedProof, // Usamos la prueba ya decodificada
   };
 
   const stakeAmountInWei = parseEther(amount);
@@ -60,7 +68,7 @@ const StakingAndMiningSection: FC<{
   await sendTransaction({
     permit2: [{
       permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
-      spender: NEX_GOLD_STAKING_ADDRESS, // El spender es el contrato de Staking
+      spender: NEX_GOLD_STAKING_ADDRESS,
       nonce: nonce.toString(),
       deadline: deadline.toString(),
     }],
@@ -68,17 +76,11 @@ const StakingAndMiningSection: FC<{
       address: NEX_GOLD_STAKING_ADDRESS,
       abi: NEX_GOLD_STAKING_ABI,
       functionName: "stake",
-      // CORRECCIÓN FINAL: 8 argumentos que coinciden con tu contrato
       args: [
-        // 1. _amount
         stakeAmountInWei,
-        // 2. root
         worldIdProof.root,
-        // 3. nullifierHash
         worldIdProof.nullifierHash,
-        // 4. proof
-        worldIdProof.proof,
-        // 5. permit (struct PermitTransferFrom)
+        worldIdProof.proof, // Ahora se envía el array correcto
         {
           permitted: {
             token: NEX_GOLD_ADDRESS,
@@ -87,14 +89,11 @@ const StakingAndMiningSection: FC<{
           nonce: nonce,
           deadline: deadline,
         },
-        // 6. transferDetails (struct SignatureTransferDetails)
         {
-          to: NEX_GOLD_STAKING_ADDRESS, // El contrato de staking recibe los tokens
+          to: NEX_GOLD_STAKING_ADDRESS,
           requestedAmount: stakeAmountInWei,
         },
-        // 7. owner
         walletAddress,
-        // 8. signature
         'PERMIT2_SIGNATURE_PLACEHOLDER_0',
       ],
     }],

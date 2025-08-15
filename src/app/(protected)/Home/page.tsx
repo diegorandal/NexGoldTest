@@ -30,53 +30,40 @@ const StakingAndMiningSection: FC<{
   }, [status, fetchContractData])
 
 const handleStake = async () => {
-
-  console.log("--- Iniciando proceso de stake ---");
-
   const value = Number.parseFloat(amount);
-  if (isNaN(value) || value <= 0) {
-    console.error("Error: La cantidad es inválida.", amount);
-    return;
-  }
-  console.log("Cantidad a stakear (ether):", amount);
+  if (isNaN(value) || value <= 0) return;
 
-  if (!walletAddress) {
-    console.error("Error: La dirección de la billetera no está disponible.");
-    return;
-  }
-  console.log("Dirección de la billetera:", walletAddress);
+  if (!walletAddress) return;
 
   const storedProof = sessionStorage.getItem("worldIdProof");
-  if (!storedProof) {
-    console.error("Error: No se encontró la prueba de World ID en sessionStorage.");
-    return;
-  }
+  if (!storedProof) return;
 
   let verificationProof;
   try {
     verificationProof = JSON.parse(storedProof);
   } catch (error) {
-    console.error("Error: No se pudo parsear la prueba de World ID.", error);
     return;
   }
 
-  if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) {
-    console.error("Error: La prueba de World ID está incompleta.", verificationProof);
-    return;
-  }
+  if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
+
+
+  const decodedProof = decodeAbiParameters(
+    [{ type: 'uint256[8]' }],
+    verificationProof.proof
+  )[0];
 
   const worldIdProof = {
     root: verificationProof.merkle_root,
     nullifierHash: verificationProof.nullifier_hash,
-    proof: verificationProof.proof,
+    proof: decodedProof,
   };
 
   const stakeAmountInWei = parseEther(amount);
   const nonce = BigInt(Date.now());
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
 
-  
-  const transactionPayload = {
+  await sendTransaction({
     permit2: [{
       permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
       spender: NEX_GOLD_STAKING_ADDRESS,
@@ -108,16 +95,7 @@ const handleStake = async () => {
         'PERMIT2_SIGNATURE_PLACEHOLDER_0',
       ],
     }],
-  };
-
-  
-  console.log("--- Payload final enviado a sendTransaction ---");
-  console.log(JSON.stringify(transactionPayload, (key, value) =>
-    typeof value === 'bigint' ? value.toString() : value, 2
-  ));
-  console.log("-------------------------------------------");
-
-  await sendTransaction(transactionPayload);
+  });
 };
 
   const handleUnstake = async () => {

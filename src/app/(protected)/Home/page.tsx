@@ -1,7 +1,15 @@
 "use client"
 
 import { useState, useEffect, type FC } from "react"
-import { createPublicClient, http, decodeAbiParameters, parseEther } from "viem";
+import { 
+  parseEther, 
+  decodeAbiParameters, 
+  createPublicClient, 
+  http, 
+  keccak256, 
+  encodePacked, 
+  toHex 
+} from "viem";
 import { worldchain } from "viem/chains";
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
@@ -31,6 +39,73 @@ const StakingAndMiningSection: FC<{
   }, [status, fetchContractData])
 
 const handleStake = async () => {
+  // --- INICIO DE LA DEPURACIÓN DE APP_ID Y ACTION_ID ---
+  console.log("--- Iniciando depuración de IDs ---");
+
+  // 1. IDs del Frontend (los que usa MiniKit para generar la prueba)
+  const frontendAppId = process.env.NEXT_PUBLIC_APP_ID || ''; // Reemplaza si lo obtienes de otro lado
+  const frontendActionId = "stake"; // Reemplaza con el `action` real que usas en tu app
+  
+  if (!frontendAppId) {
+    console.error("Error de Configuración: NEXT_PUBLIC_APP_ID no está definido en el frontend.");
+    return;
+  }
+
+  // 2. Hashear los IDs del frontend de la misma forma que el contrato
+  const hashedFrontendAppId = keccak256(encodePacked(['string'], [frontendAppId]));
+  const hashedFrontendActionId = keccak256(encodePacked(['string'], [frontendActionId]));
+
+  console.log("Frontend App ID (raw):", frontendAppId);
+  console.log("Frontend Action ID (raw):", frontendActionId);
+  console.log("Frontend App ID (hashed):", hashedFrontendAppId);
+  console.log("Frontend Action ID (hashed):", hashedFrontendActionId);
+
+  try {
+    const publicClient = createPublicClient({
+      chain: worldchain,
+      transport: http("https://worldchain-mainnet.g.alchemy.com/public"),
+    });
+
+    // 3. Leer los hashes guardados en el contrato
+    const [contractAppId, contractActionId] = await Promise.all([
+      publicClient.readContract({
+        address: NEX_GOLD_STAKING_ADDRESS,
+        abi: NEX_GOLD_STAKING_ABI,
+        functionName: 'app_id',
+      }),
+      publicClient.readContract({
+        address: NEX_GOLD_STAKING_ADDRESS,
+        abi: NEX_GOLD_STAKING_ABI,
+        functionName: 'action_id',
+      })
+    ]);
+
+    const contractAppIdHex = toHex(contractAppId);
+    const contractActionIdHex = toHex(contractActionId);
+    
+    console.log("Contrato App ID (hashed):", contractAppIdHex);
+    console.log("Contrato Action ID (hashed):", contractActionIdHex);
+
+    // 4. Comparar y mostrar el resultado
+    if (hashedFrontendAppId !== contractAppIdHex) {
+      console.error("¡ERROR DE COINCIDENCIA! El app_id del frontend no coincide con el del contrato.");
+      return; // Detener la transacción
+    }
+    if (hashedFrontendActionId !== contractActionIdHex) {
+      console.error("¡ERROR DE COINCIDENCIA! El action_id del frontend no coincide con el del contrato.");
+      return; // Detener la transacción
+    }
+
+    console.log("✅ ¡Éxito! Los IDs coinciden. Procediendo con la transacción...");
+  } catch (e) {
+    console.error("Error al leer los IDs del contrato:", e);
+    return;
+  }
+  console.log("--- Fin de la depuración de IDs ---");
+  // --- FIN DE LA DEPURACIÓN ---
+
+
+  // El resto de la lógica de stake (sin cambios)
   const value = Number.parseFloat(amount);
   if (isNaN(value) || value <= 0) return;
 
@@ -48,38 +123,6 @@ const handleStake = async () => {
 
   if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
 
-  const nullifierHash = verificationProof.nullifier_hash;
-
-
-  try {
-    console.log("Verificando si el nulificador ya fue usado:", nullifierHash);
-    
-  
-    const publicClient = createPublicClient({
-      chain: worldchain,
-      transport: http("https://worldchain-mainnet.g.alchemy.com/public"),
-    });
-
-    const isNullifierUsed = await publicClient.readContract({
-      address: NEX_GOLD_STAKING_ADDRESS,
-      abi: NEX_GOLD_STAKING_ABI,
-      functionName: 'nullifierHashes',
-      args: [nullifierHash]
-    });
-
-    if (isNullifierUsed) {
-      console.error("Error de Nulificador: Esta prueba de World ID ya fue utilizada. Por favor, verifica tu identidad de nuevo.");
-  
-      sessionStorage.removeItem("worldIdProof");
-      return;
-    } else {
-      console.log("Nulificador válido. Procediendo con el stake...");
-    }
-  } catch (e) {
-    console.error("Error al verificar el nulificador:", e);
-    return;
-  }
-
   const decodedProof = decodeAbiParameters(
     [{ type: 'uint256[8]' }],
     verificationProof.proof
@@ -87,7 +130,7 @@ const handleStake = async () => {
 
   const worldIdProof = {
     root: verificationProof.merkle_root,
-    nullifierHash: nullifierHash,
+    nullifierHash: verificationProof.nullifier_hash,
     proof: decodedProof,
   };
 
@@ -95,43 +138,39 @@ const handleStake = async () => {
   const nonce = BigInt(Date.now());
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
 
-  try {
-    await sendTransaction({
-      permit2: [{
-        permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
-        spender: NEX_GOLD_STAKING_ADDRESS,
-        nonce: nonce.toString(),
-        deadline: deadline.toString(),
-      }],
-      transaction: [{
-        address: NEX_GOLD_STAKING_ADDRESS,
-        abi: NEX_GOLD_STAKING_ABI,
-        functionName: "stake",
-        args: [
-          stakeAmountInWei,
-          worldIdProof.root,
-          worldIdProof.nullifierHash,
-          worldIdProof.proof,
-          {
-            permitted: {
-              token: NEX_GOLD_ADDRESS,
-              amount: stakeAmountInWei,
-            },
-            nonce: nonce,
-            deadline: deadline,
+  await sendTransaction({
+    permit2: [{
+      permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
+      spender: NEX_GOLD_STAKING_ADDRESS,
+      nonce: nonce.toString(),
+      deadline: deadline.toString(),
+    }],
+    transaction: [{
+      address: NEX_GOLD_STAKING_ADDRESS,
+      abi: NEX_GOLD_STAKING_ABI,
+      functionName: "stake",
+      args: [
+        stakeAmountInWei,
+        worldIdProof.root,
+        worldIdProof.nullifierHash,
+        worldIdProof.proof,
+        {
+          permitted: {
+            token: NEX_GOLD_ADDRESS,
+            amount: stakeAmountInWei,
           },
-          {
-            to: NEX_GOLD_STAKING_ADDRESS,
-            requestedAmount: stakeAmountInWei,
-          },
-          walletAddress,
-          'PERMIT2_SIGNATURE_PLACEHOLDER_0',
-        ],
-      }],
-    });
-  } finally {
-    sessionStorage.removeItem("worldIdProof");
-  }
+          nonce: nonce,
+          deadline: deadline,
+        },
+        {
+          to: NEX_GOLD_STAKING_ADDRESS,
+          requestedAmount: stakeAmountInWei,
+        },
+        walletAddress,
+        'PERMIT2_SIGNATURE_PLACEHOLDER_0',
+      ],
+    }],
+  });
 };
 
   const handleUnstake = async () => {

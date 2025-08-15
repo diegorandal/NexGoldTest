@@ -47,18 +47,16 @@ const handleStake = async () => {
 
   if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
 
-  // --- INICIO DE LA CORRECCIÓN ---
-  // Decodificamos el `proof` de un solo string a un array de 8 uint256
   const decodedProof = decodeAbiParameters(
     [{ type: 'uint256[8]' }],
     verificationProof.proof
   )[0];
-  // --- FIN DE LA CORRECCIÓN ---
+  
 
   const worldIdProof = {
     root: verificationProof.merkle_root,
     nullifierHash: verificationProof.nullifier_hash,
-    proof: decodedProof, // Usamos la prueba ya decodificada
+    proof: decodedProof,
   };
 
   const stakeAmountInWei = parseEther(amount);
@@ -80,7 +78,7 @@ const handleStake = async () => {
         stakeAmountInWei,
         worldIdProof.root,
         worldIdProof.nullifierHash,
-        worldIdProof.proof, // Ahora se envía el array correcto
+        worldIdProof.proof,
         {
           permitted: {
             token: NEX_GOLD_ADDRESS,

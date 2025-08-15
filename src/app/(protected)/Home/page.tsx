@@ -47,7 +47,6 @@ const handleStake = async () => {
 
   if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
 
-
   const decodedProof = decodeAbiParameters(
     [{ type: 'uint256[8]' }],
     verificationProof.proof
@@ -63,39 +62,43 @@ const handleStake = async () => {
   const nonce = BigInt(Date.now());
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
 
-  await sendTransaction({
-    permit2: [{
-      permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
-      spender: NEX_GOLD_STAKING_ADDRESS,
-      nonce: nonce.toString(),
-      deadline: deadline.toString(),
-    }],
-    transaction: [{
-      address: NEX_GOLD_STAKING_ADDRESS,
-      abi: NEX_GOLD_STAKING_ABI,
-      functionName: "stake",
-      args: [
-        stakeAmountInWei,
-        worldIdProof.root,
-        worldIdProof.nullifierHash,
-        worldIdProof.proof,
-        {
-          permitted: {
-            token: NEX_GOLD_ADDRESS,
-            amount: stakeAmountInWei,
+  try {
+    await sendTransaction({
+      permit2: [{
+        permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
+        spender: NEX_GOLD_STAKING_ADDRESS,
+        nonce: nonce.toString(),
+        deadline: deadline.toString(),
+      }],
+      transaction: [{
+        address: NEX_GOLD_STAKING_ADDRESS,
+        abi: NEX_GOLD_STAKING_ABI,
+        functionName: "stake",
+        args: [
+          stakeAmountInWei,
+          worldIdProof.root,
+          worldIdProof.nullifierHash,
+          worldIdProof.proof,
+          {
+            permitted: {
+              token: NEX_GOLD_ADDRESS,
+              amount: stakeAmountInWei,
+            },
+            nonce: nonce,
+            deadline: deadline,
           },
-          nonce: nonce,
-          deadline: deadline,
-        },
-        {
-          to: NEX_GOLD_STAKING_ADDRESS,
-          requestedAmount: stakeAmountInWei,
-        },
-        walletAddress,
-        'PERMIT2_SIGNATURE_PLACEHOLDER_0',
-      ],
-    }],
-  });
+          {
+            to: NEX_GOLD_STAKING_ADDRESS,
+            requestedAmount: stakeAmountInWei,
+          },
+          walletAddress,
+          'PERMIT2_SIGNATURE_PLACEHOLDER_0',
+        ],
+      }],
+    });
+  } finally {
+    sessionStorage.removeItem("worldIdProof");
+  }
 };
 
   const handleUnstake = async () => {

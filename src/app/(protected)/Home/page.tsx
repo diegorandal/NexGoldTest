@@ -1,15 +1,7 @@
 "use client"
 
 import { useState, useEffect, type FC } from "react"
-import { 
-  parseEther, 
-  decodeAbiParameters, 
-  createPublicClient, 
-  http, 
-  keccak256, 
-  encodePacked, 
-  toHex 
-} from "viem";
+import { parseEther, decodeAbiParameters, createPublicClient, http, keccak256, encodePacked, toHex } from "viem";
 import { worldchain } from "viem/chains";
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'

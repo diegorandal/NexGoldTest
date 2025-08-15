@@ -30,62 +30,76 @@ const StakingAndMiningSection: FC<{
   }, [status, fetchContractData])
 
   const handleStake = async () => {
-    const value = Number.parseFloat(amount)
-    if (isNaN(value) || value <= 0) return
+  const value = Number.parseFloat(amount);
+  if (isNaN(value) || value <= 0) return;
 
-    if (!walletAddress) return
-    
-    const storedProof = sessionStorage.getItem("worldIdProof")
-    if (!storedProof || storedProof === "undefined" || storedProof === "null") return
+  if (!walletAddress) return;
 
-    let verificationProof
-    try {
-      verificationProof = JSON.parse(storedProof)
-    } catch (error) {
-      return
-    }
+  const storedProof = sessionStorage.getItem("worldIdProof");
+  if (!storedProof || storedProof === "undefined" || storedProof === "null") return;
 
-    if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return
-
-    const worldIdProof = {
-      root: verificationProof.merkle_root,
-      nullifierHash: verificationProof.nullifier_hash,
-      proof: verificationProof.proof,
-    }
-
-    const stakeAmountInWei = parseEther(amount);
-    const nonce = BigInt(Date.now());
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
-
-    await sendTransaction({
-      permit2: [{
-        permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
-        spender: NEX_GOLD_STAKING_ADDRESS,
-        nonce: nonce.toString(),
-        deadline: deadline.toString(),
-      }],
-      transaction: [{
-        address: NEX_GOLD_STAKING_ADDRESS,
-        abi: NEX_GOLD_STAKING_ABI,
-        functionName: "stake",
-        args: [
-          stakeAmountInWei,
-          worldIdProof.root,
-          worldIdProof.nullifierHash,
-          worldIdProof.proof,
-          {
-            permitted: {
-              token: NEX_GOLD_ADDRESS,
-              amount: stakeAmountInWei,
-            },
-            nonce: nonce,
-            deadline: deadline,
-          },
-          'PERMIT2_SIGNATURE_PLACEHOLDER_0',
-        ],
-      }],
-    })
+  let verificationProof;
+  try {
+    verificationProof = JSON.parse(storedProof);
+  } catch (error) {
+    return;
   }
+
+  if (!verificationProof?.merkle_root || !verificationProof?.nullifier_hash || !verificationProof?.proof) return;
+
+  const worldIdProof = {
+    root: verificationProof.merkle_root,
+    nullifierHash: verificationProof.nullifier_hash,
+    proof: verificationProof.proof,
+  };
+
+  const stakeAmountInWei = parseEther(amount);
+  const nonce = BigInt(Date.now());
+  const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
+
+  await sendTransaction({
+    permit2: [{
+      permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmountInWei.toString() },
+      spender: NEX_GOLD_STAKING_ADDRESS, // El spender es el contrato de Staking
+      nonce: nonce.toString(),
+      deadline: deadline.toString(),
+    }],
+    transaction: [{
+      address: NEX_GOLD_STAKING_ADDRESS,
+      abi: NEX_GOLD_STAKING_ABI,
+      functionName: "stake",
+      // CORRECCIÓN FINAL: 8 argumentos que coinciden con tu contrato
+      args: [
+        // 1. _amount
+        stakeAmountInWei,
+        // 2. root
+        worldIdProof.root,
+        // 3. nullifierHash
+        worldIdProof.nullifierHash,
+        // 4. proof
+        worldIdProof.proof,
+        // 5. permit (struct PermitTransferFrom)
+        {
+          permitted: {
+            token: NEX_GOLD_ADDRESS,
+            amount: stakeAmountInWei,
+          },
+          nonce: nonce,
+          deadline: deadline,
+        },
+        // 6. transferDetails (struct SignatureTransferDetails)
+        {
+          to: NEX_GOLD_STAKING_ADDRESS, // El contrato de staking recibe los tokens
+          requestedAmount: stakeAmountInWei,
+        },
+        // 7. owner
+        walletAddress,
+        // 8. signature
+        'PERMIT2_SIGNATURE_PLACEHOLDER_0',
+      ],
+    }],
+  });
+};
 
   const handleUnstake = async () => {
     const value = Number.parseFloat(amount)

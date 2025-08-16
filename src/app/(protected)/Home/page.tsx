@@ -156,13 +156,13 @@ const StakingAndMiningSection: FC<{
               <div>
                 <p className="text-sm text-gray-300">Recompensas Mining</p>
                 <p className="text-xl font-bold text-green-400">
-                  +{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG
+                  +{Number.parseFloat(contractData.miningRewards).toFixed(4)} NXG
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-300">Recompensas Staking (APY/12%)</p>
                 <p className="text-xl font-bold text-yellow-400">
-                  +{Number.parseFloat(contractData.miningRewards).toFixed(4)} NXG
+                  +{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG
                 </p>
               </div>
             </div>

@@ -128,19 +128,22 @@ const StakingAndMiningSection: FC<{
   }
 
   const handleUnstake = async () => {
-    const value = Number.parseFloat(amount)
-    if (isNaN(value) || value <= 0) return
-    await sendTransaction({
-      transaction: [
-        {
-          to: NEX_GOLD_STAKING_ADDRESS,
-          abi: NEX_GOLD_STAKING_ABI as any,
-          functionName: "unstake",
-          args: [parseEther(amount)],
-        },
-      ],
-    })
-  }
+  const value = Number.parseFloat(amount);
+  if (isNaN(value) || value <= 0) return;
+
+  const unstakeAmountInWei = parseEther(amount);
+
+  await sendTransaction({
+    transaction: [
+      {
+        to: NEX_GOLD_STAKING_ADDRESS,
+        abi: NEX_GOLD_STAKING_ABI as any,
+        functionName: "unstake",
+        args: [unstakeAmountInWei.toString()],
+      },
+    ],
+  });
+};
 
   const handleClaim = async () => {
     await sendTransaction({

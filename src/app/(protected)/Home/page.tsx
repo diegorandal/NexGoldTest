@@ -11,12 +11,11 @@ import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
-
+import { MiniKit } from "@worldcoin/minikit-js"
 
 const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
 const NEX_GOLD_REFERRAL_ADDRESS = "0xa5957cf7f7eacaa3a695df6ffc8cf5e4989aa879"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
@@ -58,9 +57,10 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   
-  const { status, error } = useMiniKit()
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
   const [referral, setReferral] = useState<string | null>(null)
+  const { data: session } = useSession()
+  const { sendTransaction, status, error } = useMiniKit()
   const isProcessing = status === "pending"
 
   useEffect(() => {
@@ -76,9 +76,12 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   }, [status, fetchContractDataRef])
 
   const handleCopyReferralLink = async () => {
-    if (!referral) return
 
-    const enlace = `https://nexgold.com/referral/${referral}` //ejemplo papa
+    if (!session?.user?.username) return
+
+    const ref = session.user.username
+
+    const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`
 
     try {
       await navigator.clipboard.writeText(enlace)
@@ -92,19 +95,34 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
       if (!referral) return
 
       console.log("Enviando recompensa a:", referral)
-      /*
+
+      //obtener la wallet del referido
+      const user = await MiniKit.getUserByUsername(referral)
+
+      if (!user) {
+        console.error("Usuario no encontrado")
+        return
+      }
+
+      const userAddress = user.walletAddress
+      console.log("Dirección del referral:", userAddress)
+
       try {
+
         await sendTransaction({
-          to: NEX_GOLD_REFERRAL_ADDRESS,
-          data: {
-            type: "sendReward",
-            payload: { referral }
-          }
-        })
+          transaction: [
+          {
+            address: NEX_GOLD_REFERRAL_ADDRESS,
+            abi: NEX_GOLD_REFERRAL_ABI as any,
+            functionName: "rewardUser",
+            args: [userAddress],
+          },
+          ],
+        });
+
       } catch (error) {
         console.error("Error al enviar recompensa:", error)
       }
-    */
   }
 
   return (

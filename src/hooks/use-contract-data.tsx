@@ -21,6 +21,7 @@ export const useContractData = () => {
     miningRewards: "0.0",
     availableBalance: "0.0",
     lockinEndDate: null as Date | null,
+    lastMiningRewardUpdateTime: 0,
     isLoading: true,
   })
 
@@ -29,7 +30,6 @@ export const useContractData = () => {
 
     setContractData((prev) => ({ ...prev, isLoading: true }))
     try {
-
         const contractAddress = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC" as `0x${string}`;
         const walletAddress = session.user.walletAddress as `0x${string}`;
 
@@ -54,15 +54,7 @@ export const useContractData = () => {
         }) as unknown as bigint,
         publicClient.readContract({
           address: contractAddress,
-          abi: [
-            {
-              inputs: [{ internalType: "address", name: "account", type: "address" }],
-              name: "balanceOf",
-              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-              stateMutability: "view",
-              type: "function",
-            },
-          ],
+          abi: [{ inputs: [{ internalType: "address", name: "account", type: "address" }], name: "balanceOf", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" }],
           functionName: "balanceOf",
           args: [walletAddress],
         }) as unknown as bigint,
@@ -71,6 +63,7 @@ export const useContractData = () => {
       setContractData({
         stakedBalance: formatEther(staker[0]),
         lockinEndDate: staker[1] > 0 ? new Date(Number(staker[1]) * 1000) : null,
+        lastMiningRewardUpdateTime: Number(staker[3]),
         stakingRewards: formatEther(stakingRewards),
         miningRewards: formatEther(miningRewards),
         availableBalance: formatEther(availableBalance),

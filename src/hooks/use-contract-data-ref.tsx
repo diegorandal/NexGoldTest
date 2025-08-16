@@ -33,7 +33,7 @@ export const useContractDataRef = () => {
           address: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI,
           functionName: "rewardAmount",
-          args: [walletAddress],
+          args: [],
         }) as unknown as bigint,
         publicClient.readContract({
           address: NEX_GOLD_REFERRAL_ADDRESS,

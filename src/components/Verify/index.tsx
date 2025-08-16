@@ -14,15 +14,17 @@ interface VerifyButtonProps {
 const VerifyButton: React.FC<VerifyButtonProps> = ({ onClick, disabled }) => {
   return (
     <button
-      onClick={onClick}
-      disabled={disabled}
-      className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-base font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <span className="relative flex items-center px-6 py-3 transition-all ease-in duration-150 bg-gray-900 rounded-md group-hover:bg-opacity-0">
-        <ShieldCheck className="w-5 h-5 me-2 text-white" aria-hidden="true" />
-        <span className="text-white">Verify</span>
-      </span>
-    </button>
+  onClick={onClick}
+  disabled={disabled}
+  className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-base font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-yellow-400 to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+>
+
+  <span className="relative flex items-center px-6 py-3 transition-all ease-in duration-150 bg-gray-900 rounded-md group-hover:bg-opacity-0">
+  
+    <ShieldCheck className="w-5 h-5 me-2 text-yellow-400" aria-hidden="true" />
+    <span className="text-yellow-400">Verify</span>
+  </span>
+</button>
   )
 }
 

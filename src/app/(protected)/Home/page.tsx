@@ -283,7 +283,7 @@ export default function HomePage() {
           backgroundAttachment: "fixed",
         }}
       >
-        <div className="w-full max-w-md mx-auto bg-black/80 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+        <div className="w-full max-w-md mx-auto bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
           <header className="text-center mb-6">
             <h1 className="text-4xl font-bold text-white">
               <span className="text-yellow-400">Nex</span>Gold

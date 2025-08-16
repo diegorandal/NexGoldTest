@@ -8,16 +8,10 @@ export const Navigation = () => {
   const [value, setValue] = useState('Home');
 
   return (
-    
     <div
       style={{
-        
         '--w-color-background-secondary': '#000000',
-        
-        
-        '--w-color-text-secondary': '#D4AF37', 
-        
-      
+        '--w-color-text-secondary': '#D4AF37',
         '--w-color-primary': '#FFD700',
       }}
     >

@@ -396,9 +396,14 @@ function MainAppContent() {
     switch (activeSection) {
       case "dashboard":
         return (
-          <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
-            📈 Acceder a Staking & Mining
-          </GoldButton>
+          <>
+            <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
+              📈 Staking & Mining
+            </GoldButton>
+            <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
+              👥 Referidos
+            </GoldButton>
+          </>
         )
       case "staking":
         return <StakingAndMiningSection onBack={goBack} />
@@ -407,8 +412,8 @@ function MainAppContent() {
       default:
         return (
           <>
-            <GoldButton onClick={() => setActiveSection("staking")}>📈 Acceder a Staking & Mining</GoldButton>
-            <GoldButton onClick={() => setActiveSection("referral")}>👥 Acceder a Referidos</GoldButton>
+            <GoldButton onClick={() => setActiveSection("staking")}>📈 Staking & Mining</GoldButton>
+            <GoldButton onClick={() => setActiveSection("referral")}>👥 Referidos</GoldButton>
           </>
         )
     }

@@ -9,8 +9,18 @@ import { useRouter } from "next/navigation"
 export default function Page() {
   const { status } = useSession()
   const router = useRouter()
-
   const [step, setStep] = useState<"loading" | "login" | "verify">("loading")
+
+  // On app initialization
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search)
+      const refCode = urlParams.get('ref')
+      console.log("Referral code:", refCode)
+    } catch (error) {
+      console.error("Error handling referral code:", error)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === "loading") return

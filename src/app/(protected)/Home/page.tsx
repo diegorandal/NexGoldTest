@@ -250,9 +250,6 @@ function MainAppContent() {
 
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <UserInfo />
-      </div>
       <main>{renderSection()}</main>
     </div>
   )
@@ -284,12 +281,9 @@ export default function HomePage() {
         }}
       >
         <div className="w-full max-w-md mx-auto bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
-          <header className="text-center mb-6">
-            <h1 className="text-4xl font-bold text-white">
-              <span className="text-yellow-400">Nex</span>Gold
-            </h1>
-            <p className="text-yellow-500 text-lg">NXG Official App</p>
-          </header>
+          <div className="mb-6">
+        <UserInfo />
+       </div>
           <MainAppContent />
         </div>
       </div>

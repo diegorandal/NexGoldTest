@@ -122,7 +122,14 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                 {contractDataRef.rewardCount}
               </p>
             </div>
-            
+
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-300">Recompensa por referido</p>
+              <p className="text-3xl font-bold text-yellow-400">
+                {contractDataRef.rewardAmount} NXG
+              </p>
+            </div>
+
             <div className="text-center mb-4">
               <p className="text-sm text-gray-300">Referido por:</p>
               <p className="text-xl font-bold text-white">

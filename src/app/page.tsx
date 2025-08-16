@@ -11,10 +11,6 @@ export default function Page() {
   const router = useRouter()
   const [step, setStep] = useState<"loading" | "login" | "verify">("loading")
 
-  // On app initialization
-  useEffect(() => {
-  }, [])
-
   useEffect(() => {
     if (status === "loading") return
 
@@ -29,6 +25,9 @@ export default function Page() {
     sessionStorage.setItem("worldIdProof", JSON.stringify(verificationProof))
     sessionStorage.setItem("isVerified", "true")
 
+    const searchParams = useSearchParams();
+    const ref = searchParams.get("ref");
+    console.log("ref:", ref)
 
     router.push("/Home")
 

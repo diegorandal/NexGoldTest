@@ -25,6 +25,10 @@ export default function Page() {
     sessionStorage.setItem("worldIdProof", JSON.stringify(verificationProof))
     sessionStorage.setItem("isVerified", "true")
 
+    //prueba
+    const referral = localStorage.getItem('referrer');
+    // Muestra el valor en la consola
+    console.log(referral); // Salida: "diego"
 
     router.push("/Home")
 

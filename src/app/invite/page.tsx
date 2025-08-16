@@ -14,7 +14,10 @@ export default function ReferidoPage() {
     const ref = searchParams.get('ref');
     if (ref) {
       setRefName(ref);
+      
+      //guardamos local para poder hacer la transaccion
       localStorage.setItem('referrer', ref);
+      localStorage.setItem('rewardReferrer', 'false');
       console.log('Referrer:', ref);
     }
 
@@ -26,6 +29,8 @@ export default function ReferidoPage() {
     <div>
       {refName && <p>Has sido referido por: {refName}</p>}
       {!refName && <p>No se ha encontrado información del referente.</p>}
+        <p></p>
+        <p>Redirigiendo...</p>
     </div>
   );
 }

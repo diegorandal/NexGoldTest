@@ -6,12 +6,49 @@ import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
-//import NEX_GOLD_ABI from "@/abi/nexgoldABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
-const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1" // version simple con permit2 DWD
-const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC" // Dirección del token NEX GOLD
+
+const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
+const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+
+const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
+  const [displayReward, setDisplayReward] = useState(0);
+
+  useEffect(() => {
+    if (!lastUpdateTime || lastUpdateTime === 0 || stakedBalance <= 0) {
+      setDisplayReward(0);
+      return;
+    }
+
+    const MINING_REWARD_RATE = 10;
+    const MINING_INTERVAL_SECONDS = 24 * 60 * 60;
+
+    const interval = setInterval(() => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const timeElapsed = nowSeconds - lastUpdateTime;
+
+      if (timeElapsed < 0) {
+        setDisplayReward(0);
+        return;
+      }
+
+      const progressInCycle = (timeElapsed % MINING_INTERVAL_SECONDS) / MINING_INTERVAL_SECONDS;
+      const animatedReward = progressInCycle * MINING_REWARD_RATE;
+
+      setDisplayReward(animatedReward);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastUpdateTime, stakedBalance]);
+
+  return (
+    <p className="text-xl font-bold text-green-400">
+      +{displayReward.toFixed(4)} NXG
+    </p>
+  );
+};
 
 const StakingAndMiningSection: FC<{
   onBack: () => void
@@ -35,7 +72,6 @@ const StakingAndMiningSection: FC<{
     if (isNaN(value) || value <= 0) return
 
     const storedProof = sessionStorage.getItem("worldIdProof")
-    console.log("Stored Proof:", storedProof)
     if (!storedProof || storedProof === "undefined" || storedProof === "null") {
       console.error("No hay datos de verificación válidos")
       return
@@ -58,21 +94,12 @@ const StakingAndMiningSection: FC<{
       console.error("Datos de verificación incompletos")
       return
     }
-
-    const worldIdProof = {
-      root: verificationProof.merkle_root,
-      nullifierHash: verificationProof.nullifier_hash,
-      proof: verificationProof.proof,
-    }
     
     const nonce = Date.now();
     const now = Math.floor(Date.now() / 1000);
     const deadline = now + 180;
     const stakeAmount = (value * 1e18).toString();
-
     const walletAddress = session?.data?.user?.walletAddress;
-
-    console.log("user address:", walletAddress);
 
     await sendTransaction({
       transaction: [
@@ -98,7 +125,6 @@ const StakingAndMiningSection: FC<{
         },
       ],
     })
-
   }
 
   const handleUnstake = async () => {
@@ -155,9 +181,10 @@ const StakingAndMiningSection: FC<{
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
                 <p className="text-sm text-gray-300">Recompensas Mining</p>
-                <p className="text-xl font-bold text-green-400">
-                  +{Number.parseFloat(contractData.miningRewards).toFixed(4)} NXG
-                </p>
+                <AnimatedMiningRewards
+                  lastUpdateTime={contractData.lastMiningRewardUpdateTime}
+                  stakedBalance={Number.parseFloat(contractData.stakedBalance)}
+                />
               </div>
               <div>
                 <p className="text-sm text-gray-300">Recompensas Staking (APY/12%)</p>
@@ -282,8 +309,8 @@ export default function HomePage() {
       >
         <div className="w-full max-w-md mx-auto bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
           <div className="mb-6">
-        <UserInfo />
-       </div>
+            <UserInfo />
+          </div>
           <MainAppContent />
         </div>
       </div>
@@ -291,4 +318,4 @@ export default function HomePage() {
   }
 
   return null
-}
+    }

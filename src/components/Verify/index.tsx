@@ -76,12 +76,9 @@ export function Verify({ onSuccess }: VerifyProps) {
     }
   }
 
+  
   return (
-    <div
-      className="w-full max-w-sm flex flex-col items-center text-center mt-4
-      bg-gradient-to-br from-black to-yellow-500/80 rounded-lg p-6 shadow-lg"
-    >
-      <p className="mb-4 text-slate-300">Verifica y comenza a ganar.</p>
+    <>
       {buttonState !== "success" && (
         <VerifyButton onClick={handleVerificationClick} disabled={buttonState === "pending"} />
       )}
@@ -90,6 +87,6 @@ export function Verify({ onSuccess }: VerifyProps) {
         {buttonState === "failed" && <p className="text-red-400">Error al verificar, intenta nuevamente.</p>}
         {buttonState === "success" && <p className="text-green-400">¡Verificación exitosa! Redirigiendo...</p>}
       </div>
-    </div>
+    </>
   )
 }

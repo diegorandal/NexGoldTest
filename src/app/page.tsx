@@ -4,13 +4,12 @@ import { useEffect, useState } from "react"
 import { AuthButton } from "@/components/AuthButton"
 import { Verify } from "@/components/Verify"
 import { useSession } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 export default function Page() {
   const { status } = useSession()
   const router = useRouter()
   const [step, setStep] = useState<"loading" | "login" | "verify">("loading")
-  const searchParams = useSearchParams();
   
   useEffect(() => {
     if (status === "loading") return
@@ -26,9 +25,6 @@ export default function Page() {
     sessionStorage.setItem("worldIdProof", JSON.stringify(verificationProof))
     sessionStorage.setItem("isVerified", "true")
 
-
-    const ref = searchParams.get("ref");
-    console.log("ref:", ref)
 
     router.push("/Home")
 

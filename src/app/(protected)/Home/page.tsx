@@ -272,7 +272,7 @@ export default function HomePage() {
   if (status === "authenticated") {
     return (
       <div
-        className="min-h-screen flex items-center justify-center p-4 font-sans"
+        className="min-h-screen flex items-start justify-center p-4 pt-8 font-sans"
         style={{
           backgroundImage: "url('/background.jpg')",
           backgroundSize: "cover",

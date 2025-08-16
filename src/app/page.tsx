@@ -30,10 +30,6 @@ export default function Page() {
     sessionStorage.setItem("isVerified", "true")
 
 
-    const searchParams = useSearchParams();
-    const refCode = searchParams.get('ref');
-    console.log('Código de referido:', refCode);
-
     router.push("/Home")
 
   }

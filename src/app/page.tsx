@@ -5,6 +5,7 @@ import { AuthButton } from "@/components/AuthButton"
 import { Verify } from "@/components/Verify"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { NextResponse } from 'next/server';
 
 export default function Page() {
   const { status } = useSession()
@@ -30,9 +31,19 @@ export default function Page() {
     sessionStorage.setItem("isVerified", "true")
 
     try {
-      const urlParams = new URLSearchParams(window.location.search)
-      const refCode = urlParams.get('ref')
-      console.log("Referral code:", refCode)
+
+      //analisis de la path
+      const url = async function GET(request: Request) {
+        const url = new URL(request.url);
+        const refCode = url.pathname.split('/').at(-2);
+        console.log("path completa:", url)
+        console.log("path spliteada:", refCode)
+      }
+
+      if(!url) {
+        console.error("No se pudo obtener la URL")
+      }
+
     } catch (error) {
       console.error("Error handling referral code:", error)
     }

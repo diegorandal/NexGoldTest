@@ -405,7 +405,12 @@ function MainAppContent() {
       case "referral":
         return <ReferralSection onBack={goBack} />
       default:
-        return <GoldButton onClick={() => setActiveSection("staking")}>📈 Acceder a Staking & Mining</GoldButton>
+        return (
+          <>
+            <GoldButton onClick={() => setActiveSection("staking")}>📈 Acceder a Staking & Mining</GoldButton>
+            <GoldButton onClick={() => setActiveSection("referral")}>👥 Acceder a Referidos</GoldButton>
+          </>
+        )
     }
   }
 

@@ -136,7 +136,7 @@ const StakingAndMiningSection: FC<{
   await sendTransaction({
     transaction: [
       {
-        to: NEX_GOLD_STAKING_ADDRESS,
+        address: NEX_GOLD_STAKING_ADDRESS,
         abi: NEX_GOLD_STAKING_ABI as any,
         functionName: "unstake",
         args: [unstakeAmountInWei.toString()],
@@ -149,7 +149,7 @@ const StakingAndMiningSection: FC<{
     await sendTransaction({
       transaction: [
         {
-          to: NEX_GOLD_STAKING_ADDRESS,
+          address: NEX_GOLD_STAKING_ADDRESS,
           abi: NEX_GOLD_STAKING_ABI as any,
           functionName: "claimAllRewards",
           args: [],

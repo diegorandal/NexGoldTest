@@ -1,33 +1,31 @@
-'use client'; // <-- Esto es necesario para usar hooks
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from "next/navigation"
 
 export default function ReferidoPage() {
   const [refName, setRefName] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter()
 
   useEffect(() => {
     // Lee el parámetro 'ref' de la URL
     const ref = searchParams.get('ref');
     if (ref) {
       setRefName(ref);
+      localStorage.setItem('referrer', ref);
+      console.log('Referrer:', ref);
     }
+
+    router.push("/");
+
   }, [searchParams]);
 
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>¡Gracias por unirte!</h1>
-      {refName && (
-        <p>
-          Has sido referido por: <strong>{refName}</strong>
-        </p>
-      )}
-      {!refName && (
-        <p>
-          Si has llegado aquí por un enlace, algo no ha funcionado bien.
-        </p>
-      )}
+    <div>
+      {refName && <p>Has sido referido por: {refName}</p>}
+      {!refName && <p>No se ha encontrado información del referente.</p>}
     </div>
   );
 }

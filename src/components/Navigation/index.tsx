@@ -4,22 +4,28 @@ import { TabItem, Tabs } from '@worldcoin/mini-apps-ui-kit-react';
 import { Bank, Home, User } from 'iconoir-react';
 import { useState } from 'react';
 
-/**
- * This component uses the UI Kit to navigate between pages
- * Bottom navigation is the most common navigation pattern in Mini Apps
- * We require mobile first design patterns for mini apps
- * Read More: https://docs.world.org/mini-apps/design/app-guidelines#mobile-first
- */
-
 export const Navigation = () => {
   const [value, setValue] = useState('Home');
 
   return (
-    <Tabs value={value} onValueChange={setValue}>
-      <TabItem value="home" icon={<Home />} label="Home" />
-      {/* // TODO: These currently don't link anywhere */}
-      <TabItem value="wallet" icon={<Bank />} label="Wallet" />
-      <TabItem value="profile" icon={<User />} label="Profile" />
-    </Tabs>
+    
+    <div
+      style={{
+        
+        '--w-color-background-secondary': '#000000',
+        
+        
+        '--w-color-text-secondary': '#D4AF37', 
+        
+      
+        '--w-color-primary': '#FFD700',
+      }}
+    >
+      <Tabs value={value} onValueChange={setValue}>
+        <TabItem value="home" icon={<Home />} label="Home" />
+        <TabItem value="wallet" icon={<Bank />} label="Wallet" />
+        <TabItem value="profile" icon={<User />} label="Profile" />
+      </Tabs>
+    </div>
   );
 };

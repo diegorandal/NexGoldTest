@@ -13,13 +13,6 @@ export default function Page() {
 
   // On app initialization
   useEffect(() => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search)
-      const refCode = urlParams.get('ref')
-      console.log("Referral code:", refCode)
-    } catch (error) {
-      console.error("Error handling referral code:", error)
-    }
   }, [])
 
   useEffect(() => {
@@ -35,7 +28,19 @@ export default function Page() {
   const handleVerificationSuccess = (verificationProof: any) => {
     sessionStorage.setItem("worldIdProof", JSON.stringify(verificationProof))
     sessionStorage.setItem("isVerified", "true")
+
+    try {
+      const urlParams = new URLSearchParams(window.location.search)
+      const refCode = urlParams.get('ref')
+      console.log("Referral code:", refCode)
+    } catch (error) {
+      console.error("Error handling referral code:", error)
+    }
+
+
     router.push("/Home")
+
+
   }
 
   return (

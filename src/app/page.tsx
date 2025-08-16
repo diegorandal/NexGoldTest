@@ -4,8 +4,7 @@ import { useEffect, useState } from "react"
 import { AuthButton } from "@/components/AuthButton"
 import { Verify } from "@/components/Verify"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { NextResponse } from 'next/server';
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function Page() {
   const { status } = useSession()
@@ -30,27 +29,12 @@ export default function Page() {
     sessionStorage.setItem("worldIdProof", JSON.stringify(verificationProof))
     sessionStorage.setItem("isVerified", "true")
 
-    try {
 
-      //analisis de la path
-      const url = async function GET(request: Request) {
-        const url = new URL(request.url);
-        const refCode = url.pathname.split('/').at(-2);
-        console.log("path completa:", url)
-        console.log("path spliteada:", refCode)
-      }
-
-      if(!url) {
-        console.error("No se pudo obtener la URL")
-      }
-
-    } catch (error) {
-      console.error("Error handling referral code:", error)
-    }
-
+    const searchParams = useSearchParams();
+    const refCode = searchParams.get('ref');
+    console.log('Código de referido:', refCode);
 
     router.push("/Home")
-
 
   }
 

@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <main 
-      className="flex flex-col items-center justify-center min-h-screen text-white p-4"
+      className="flex flex-col items-center justify-end min-h-screen pb-40 text-white p-4"
       style={{
         backgroundImage: "url('/background.jpg')",
         backgroundSize: "cover",
@@ -40,11 +40,11 @@ export default function Page() {
     >
       <div className="absolute inset-0 bg-black/10 z-0"/>
 
-      <div className="relative z-10 flex flex-col items-center justify-center mt-32">
-        {step === "loading" && <p>Conectando...</p>}
-        {step === "login" && <AuthButton />}
-        {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
-      </div>
+      <>
+       {step === "loading" && <p>Conectando...</p>}
+       {step === "login" && <AuthButton />}
+       {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
+      </>
     </main>
   )
 }

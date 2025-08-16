@@ -223,8 +223,8 @@ const StakingAndMiningSection: FC<{
             </p>
           )}
         </div>
+        <BackButton onClick={onBack} />
       </Card>
-      <BackButton onClick={onBack} />
     </div>
   )
 }

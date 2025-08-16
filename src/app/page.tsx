@@ -28,7 +28,7 @@ export default function Page() {
     //prueba
     const referral = localStorage.getItem('referrer');
     // Muestra el valor en la consola
-    console.log(referral); // Salida: "diego"
+    console.log(referral);
 
     router.push("/Home")
 

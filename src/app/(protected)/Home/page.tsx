@@ -6,12 +6,17 @@ import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
+import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
+import { useContractDataRef } from "@/hooks/use-contract-data-ref"
+
 
 const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
+const NEX_GOLD_REFERRAL_ADDRESS = "0xa5957cf7f7eacaa3a695df6ffc8cf5e4989aa879"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
@@ -50,16 +55,140 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
   );
 };
 
+
+const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
+  
+  const { status, error } = useMiniKit()
+  const { contractDataRef, fetchContractDataRef } = useContractDataRef()
+  const [referral, setReferral] = useState<string | null>(null)
+  const isProcessing = status === "pending"
+
+  useEffect(() => {
+    setReferral(localStorage.getItem('referrer'))
+  }, [])
+  
+  //  rewardReferrer
+
+  useEffect(() => {
+    if (status === "success") {
+      fetchContractDataRef()
+    }
+  }, [status, fetchContractDataRef])
+
+  const handleCopyReferralLink = async () => {
+    if (!referral) return
+
+    const enlace = `https://nexgold.com/referral/${referral}` //ejemplo papa
+
+    try {
+      await navigator.clipboard.writeText(enlace)
+      console.log("Enlace de referido copiado al portapapeles:", enlace)
+    } catch (error) {
+      console.error("Error al copiar el enlace de referido:", error)
+    }
+  }
+  
+  const handleSendReward = async () => {
+      if (!referral) return
+
+      console.log("Enviando recompensa a:", referral)
+      /*
+      try {
+        await sendTransaction({
+          to: NEX_GOLD_REFERRAL_ADDRESS,
+          data: {
+            type: "sendReward",
+            payload: { referral }
+          }
+        })
+      } catch (error) {
+        console.error("Error al enviar recompensa:", error)
+      }
+    */
+  }
+
+  return (
+    <div className="animate-fade-in">
+      <Card className="space-y-4">
+        {contractDataRef.isLoading ? (
+          <div className="text-center text-yellow-400">
+            <Loader className="animate-spin inline-block" /> Cargando datos...
+          </div>
+        ) : (
+          <>
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-300">Mis Referidos</p>
+              <p className="text-3xl font-bold text-yellow-400">
+                {contractDataRef.rewardCount}
+              </p>
+            </div>
+            
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-300">Referido por:</p>
+              <p className="text-xl font-bold text-white">
+                {referral ? referral : "Nadie"}
+              </p>
+            </div>
+
+            <div className="flex flex-col space-y-4">
+              <GoldButton onClick={handleCopyReferralLink}>
+                Copiar mi enlace
+              </GoldButton>
+              <GoldButton
+                onClick={handleSendReward}
+                className="w-full"
+                disabled={isProcessing}
+              >
+                Enviar recompensa
+              </GoldButton>
+            </div>
+          </>
+        )}
+
+        {/* Sección de estado de la transacción */}
+        <div className="h-10 text-center text-sm flex items-center justify-center">
+          {status === "pending" && (
+            <p className="text-yellow-400 flex items-center gap-2">
+              <Loader className="animate-spin" />
+              Procesando...
+            </p>
+          )}
+          {status === "success" && (
+            <p className="text-green-400 flex items-center gap-2">
+              <CheckCircle />
+              ¡Éxito!
+            </p>
+          )}
+          {status === "error" && (
+            <p className="text-red-400 flex items-center gap-2">
+              <XCircle />
+              Error: {error}
+            </p>
+          )}
+        </div>
+
+        <BackButton onClick={onBack} />
+      </Card>
+    </div>
+  );
+};
+
 const StakingAndMiningSection: FC<{
   onBack: () => void
 }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
   const { sendTransaction, status, error } = useMiniKit()
   const { contractData, fetchContractData, isLocked } = useContractData()
-  
+
   const session = useSession();
 
   const isProcessing = status === "pending"
+
+    useEffect(() => {
+    if (status === "success") {
+      fetchContractData()
+    }
+  }, [status, fetchContractData])
 
   useEffect(() => {
     if (status === "success") {
@@ -260,7 +389,7 @@ const StakingAndMiningSection: FC<{
 }
 
 function MainAppContent() {
-  const [activeSection, setActiveSection] = useState<"dashboard" | "staking">("dashboard")
+  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral">("dashboard")
 
   const renderSection = () => {
     const goBack = () => setActiveSection("dashboard")
@@ -273,6 +402,8 @@ function MainAppContent() {
         )
       case "staking":
         return <StakingAndMiningSection onBack={goBack} />
+      case "referral":
+        return <ReferralSection onBack={goBack} />
       default:
         return <GoldButton onClick={() => setActiveSection("staking")}>📈 Acceder a Staking & Mining</GoldButton>
     }

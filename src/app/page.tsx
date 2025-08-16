@@ -29,13 +29,22 @@ export default function Page() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-yellow-500 to-yellow-700 text-white p-4">
-      {step === "loading" && <p>Conectando...</p>}
+    <main 
+      className="flex flex-col items-center justify-center min-h-screen text-white p-4"
+      style={{
+        backgroundImage: "url('/background.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/10 z-0"/>
 
-      {step === "login" && <AuthButton />}
-
-      {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
-
+      <div className="relative z-10 flex flex-col items-center justify-center mt-32">
+        {step === "loading" && <p>Conectando...</p>}
+        {step === "login" && <AuthButton />}
+        {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
+      </div>
     </main>
   )
 }

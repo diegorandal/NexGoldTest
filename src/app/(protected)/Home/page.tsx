@@ -59,16 +59,27 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
   const [referral, setReferral] = useState<string | null>(null)
+  const [referral_name, setReferralName] = useState<string | null>(null)
   const { data: session } = useSession()
   const { sendTransaction, status, error } = useMiniKit()
   const isProcessing = status === "pending"
 
   useEffect(() => {
+
     setReferral(localStorage.getItem('referrer'))
+    
+    if (!referral) return
+
+    const fetchUser = async () => {
+      const user = await MiniKit.getUserByAddress(referral)
+      setReferralName(user?.username || null)
+    }
+
+    fetchUser()
+    console.log("Usuario encontrado:", referral_name)
+
   }, [])
   
-  //  rewardReferrer
-
   useEffect(() => {
     if (status === "success") {
       fetchContractDataRef()
@@ -76,13 +87,9 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   }, [status, fetchContractDataRef])
 
   const handleCopyReferralLink = async () => {
-
     if (!session?.user?.walletAddress) return
-
     const ref = session.user.walletAddress
-
     const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`
-
     try {
       await navigator.clipboard.writeText(enlace)
       console.log("Enlace de referido copiado al portapapeles:", enlace)
@@ -92,21 +99,15 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   }
   
   const handleSendReward = async () => {
-      if (!referral) return
+
+    if (!referral) return
 
       console.log("Enviando recompensa a:", referral)
 
-      //obtener la wallet del referido
-      const user = await MiniKit.getUserByAddress(referral)
-
-      if (!user) {
+      if (!referral_name) {
         console.error("Usuario no encontrado")
         return
       }
-      console.log("Usuario encontrado:", user.username)
-
-      const userAddress = user.walletAddress
-      console.log("Dirección del referral:", userAddress)
 
       try {
 
@@ -116,7 +117,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             address: NEX_GOLD_REFERRAL_ADDRESS,
             abi: NEX_GOLD_REFERRAL_ABI as any,
             functionName: "rewardUser",
-            args: [userAddress],
+            args: [referral],
           },
           ],
         });
@@ -152,7 +153,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <div className="text-center mb-4">
               <p className="text-sm text-gray-300">Referido por:</p>
               <p className="text-xl font-bold text-white">
-                {referral ? referral : "Nadie"}
+                {referral_name ? referral_name : "Nadie"}
               </p>
             </div>
 

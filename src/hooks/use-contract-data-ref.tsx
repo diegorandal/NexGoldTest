@@ -18,6 +18,8 @@ export const useContractDataRef = () => {
   const [contractDataRef, setContractDataRef] = useState({
     rewardAmount: "0",
     rewardCount: "0",
+    top3Addresses: [] as string[],
+    top3Counts: [] as string[],
     isLoading: true,
   })
 
@@ -28,7 +30,7 @@ export const useContractDataRef = () => {
     try {
         const walletAddress = session.user.walletAddress;
 
-        const [amount, count] = await Promise.all([
+        const [amount, count, top3] = await Promise.all([
         publicClient.readContract({
           address: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI,
@@ -41,13 +43,21 @@ export const useContractDataRef = () => {
           functionName: "rewardCount",
           args: [walletAddress],
         }) as unknown as bigint,
+        publicClient.readContract({
+            address: NEX_GOLD_REFERRAL_ADDRESS,
+            abi: NEX_GOLD_REFERRAL_ABI,
+            functionName: "getTop3",
+        }) as unknown as [string[], bigint[]],
       ])
 
       setContractDataRef({
         rewardAmount: formatEther(amount).toString(),
         rewardCount: count.toString(),
+        top3Addresses: top3[0],
+        top3Counts: top3[1].map(count => count.toString()),
         isLoading: false,
       })
+
     } catch (e) {
       console.error("Error fetching contract data:", e)
       setContractDataRef((prev) => ({ ...prev, isLoading: false }))

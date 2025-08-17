@@ -50,6 +50,8 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { sendTransaction, status, error } = useMiniKit()
   const isProcessing = status === "pending"
 
+  localStorage.setItem('referrer', ""); //PRUEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
   useEffect(() => {
     const storedReferral = localStorage.getItem('referrer');
     if (storedReferral) {
@@ -128,7 +130,7 @@ return (
                           )}
                           {contractDataRef.canReward && (
                             <div>
-                                <GoldButton onClick={handleSendRewardWithAddress} className="w-full" disabled={isProcessing || !rewardAddress}>
+                                <GoldButton onClick={handleSendRewardWithAddress} className="w-full" disabled={isProcessing || (!rewardAddress || !referral_name)}>
                                     Enviar recompensa
                                 </GoldButton>
                             </div>

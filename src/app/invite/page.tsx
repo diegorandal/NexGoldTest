@@ -17,7 +17,6 @@ export default function ReferidoPage() {
       
       //guardamos local para poder hacer la transaccion
       localStorage.setItem('referrer', ref);
-      localStorage.setItem('rewardReferrer', 'false');
       console.log('Referrer:', ref);
     }
 

@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 // NOTA: He cambiado la librería de íconos a lucide-react, que es muy popular y consistente.
 // Si prefieres usar iconoir-react, solo cambia esta línea.
-import { Home, Wallet, Gamepad, Trophy, Info } from 'lucide-react';
+import { Home, Wallet, Gamepad, Trophy, Info } from 'iconoir-react';
 
 const navItems = [
   { href: '/Home', label: 'Home', icon: Home },

@@ -1,7 +1,7 @@
 'use client';
 
 import { TabItem, Tabs } from '@worldcoin/mini-apps-ui-kit-react';
-import { Home, User, Wallet } from 'lucide-react';
+import { Home, User, Wallet } from 'iconoir-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

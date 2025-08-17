@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type FC } from "react"
+import { useState, useEffect, type FC, useCallback } from "react"
 import { parseEther } from "viem"
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
@@ -16,6 +16,61 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+const WORLDSCAN_API_URL = 'https://www.worldscan.io/api';
+
+// Definición del tipo de objeto para una transacción
+interface Transaction {
+    hash: string;
+    value: string;
+    to: string;
+    timeStamp: string;
+    // Puedes añadir más propiedades si las necesitas, como 'from', 'tokenName', etc.
+}
+
+// Hook personalizado para obtener datos de la billetera
+const useWalletData = () => {
+    const { data: session } = useSession();
+    const walletAddress = session?.user?.walletAddress;
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchWalletData = useCallback(async () => {
+        if (!walletAddress) {
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(
+                `${WORLDSCAN_API_URL}?module=account&action=tokentx&contractaddress=${NEX_GOLD_ADDRESS}&address=${walletAddress}&sort=desc`
+            );
+            if (!response.ok) {
+                throw new Error('La respuesta de la red no fue válida.');
+            }
+            const data = await response.json();
+            if (data.status === '1') {
+                setTransactions(data.result);
+            } else if (data.message === 'No transactions found') {
+                setTransactions([]);
+            } else {
+                throw new Error(data.message || 'Error al obtener las transacciones');
+            }
+        } catch (e) {
+            console.error('No se pudieron cargar los datos.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [walletAddress]);
+
+    useEffect(() => {
+        fetchWalletData();
+    }, [fetchWalletData]);
+
+    return { transactions, isLoading, error, fetchWalletData };
+};
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
@@ -40,6 +95,66 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
 
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
+
+const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { transactions, isLoading, error } = useWalletData();
+
+      return (
+        <div className="animate-fade-in p-4">
+            <Card className="space-y-4 bg-gray-900 text-white rounded-xl shadow-lg">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-yellow-400">Historial de Transacciones</h2>
+                    <button
+                        onClick={onBack}
+                        className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors"
+                    >
+                        {/* Asumiendo que hay un ícono de flecha atrás */}
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                {isLoading ? (
+                    <div className="text-center text-yellow-400 p-4">
+                        <Loader className="animate-spin inline-block mr-2" /> Cargando datos...
+                    </div>
+                ) : error ? (
+                    <div className="text-center text-red-400 p-4">
+                        <XCircle className="inline-block mr-2" /> Error: {error}
+                    </div>
+                ) : transactions.length > 0 ? (
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
+                        {transactions.map((tx) => (
+                            <div key={tx.hash} className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+                                <div className="flex-1">
+                                    <p className="font-bold text-yellow-400 break-all">{parseFloat(tx.value) / 10**18} NXG</p>
+                                    <p className="text-sm text-gray-400 break-all">A: {tx.to}</p>
+                                </div>
+                                <div className="mt-2 md:mt-0 md:ml-4 text-right">
+                                    <p className="text-xs text-gray-500">{new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}</p>
+                                    <a
+                                        href={`https://worldscan.io/tx/${tx.hash}`} // Reemplaza con la URL real de tu explorador de bloques
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-yellow-400 text-sm hover:underline"
+                                    >
+                                        Ver Transacción
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-gray-400 p-4">
+                        <p>No se encontraron transacciones.</p>
+                    </div>
+                )}
+            </Card>
+        </div>
+    );
+
+}
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
@@ -257,7 +372,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG</p></div>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div><p className="text-sm text-gray-300">Recompensas Mining</p><AnimatedMiningRewards lastUpdateTime={contractData.lastMiningRewardUpdateTime} stakedBalance={Number.parseFloat(contractData.stakedBalance)} /></div>
-              <div><p className="text-sm text-gray-300">Recompensas Staking (APY/{contractData.stakingAPY}%)</p><p className="text-xl font-bold text-yellow-400">+{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG</p></div>
+              <div><p className="text-sm text-gray-300">Recompensas Staking (APY/{contractData.stakingAPY / 100}%)</p><p className="text-xl font-bold text-yellow-400">+{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG</p></div>
             </div>
             {contractData.lockinEndDate && Number.parseFloat(contractData.stakedBalance) > 0 && <div className={`text-center p-2 rounded-md text-sm ${isLocked ? "bg-red-900/50 text-red-300" : "bg-green-900/50 text-green-300"}`}><Info className="inline-block mr-2 h-4 w-4" />{isLocked ? `Bloqueado hasta: ${contractData.lockinEndDate.toLocaleString()}` : "Fondos desbloqueados."}</div>}
             <InputGold type="number" placeholder="Cantidad de NXG" value={amount} onChange={(e: any) => setAmount(e.target.value)} />
@@ -279,7 +394,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral">("dashboard")
+  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -318,15 +433,22 @@ export default function HomePage() {
                   📈 Staking & Mining
                 </GoldButton>
               </div>
+              <div>
+                <GoldButton className="w-full" onClick={() => setActiveSection('history')}>
+                  📜 Historial
+                </GoldButton>
+              </div>
               <div className="mt-auto pt-4 flex justify-center">
                 <button onClick={() => setActiveSection("referral")} className="flex items-center justify-center text-yellow-400 font-medium transition-transform duration-200 hover:scale-110">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  Referidos
+                  🤝 Referidos
                 </button>
               </div>
             </>
           ) : activeSection === "staking" ? (
             <StakingAndMiningSection onBack={goBack} />
+          ) : activeSection === "history" ? (
+            <HistorySection onBack={goBack} />
           ) : (
             <ReferralSection onBack={goBack} />
           )}

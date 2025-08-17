@@ -103,7 +103,8 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         console.error("Usuario no encontrado")
         return
       }
-
+      console.log("Usuario encontrado:", user)
+      
       const userAddress = user.walletAddress
       console.log("Dirección del referral:", userAddress)
 

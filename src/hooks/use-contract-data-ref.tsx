@@ -17,6 +17,7 @@ const publicClient = createPublicClient({
 export const useContractDataRef = () => {
   const { data: session } = useSession()
   const [contractDataRef, setContractDataRef] = useState({
+    canReward: false,
     rewardAmount: "0",
     rewardCount: "0",
     top3Addresses: [] as string[],
@@ -31,7 +32,13 @@ export const useContractDataRef = () => {
     try {
         const walletAddress = session.user.walletAddress;
 
-        const [amount, count, top3] = await Promise.all([
+        const [canReward, amount, count, top3] = await Promise.all([
+        publicClient.readContract({
+          address: NEX_GOLD_REFERRAL_ADDRESS,
+          abi: NEX_GOLD_REFERRAL_ABI,
+          functionName: "canReward",
+          args: [walletAddress],
+        }) as unknown as boolean,
         publicClient.readContract({
           address: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI,
@@ -62,6 +69,7 @@ export const useContractDataRef = () => {
       );
 
       setContractDataRef({
+        canReward: canReward,
         rewardAmount: formatEther(amount).toString(),
         rewardCount: count.toString(),
         top3Addresses: top3Usernames, 

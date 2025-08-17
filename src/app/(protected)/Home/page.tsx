@@ -65,20 +65,24 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const isProcessing = status === "pending"
 
   useEffect(() => {
+    const storedReferral = localStorage.getItem('referrer');
 
-    setReferral(localStorage.getItem('referrer'))
-    
-    if (!referral) return
-
-    const fetchUser = async () => {
-      const user = await MiniKit.getUserByAddress(referral)
-      setReferralName(user?.username || null)
+    if (storedReferral) {
+      setReferral(storedReferral);
+      const fetchUser = async () => {
+        const user = await MiniKit.getUserByAddress(storedReferral);
+        setReferralName(user?.username || null);
+      };
+      fetchUser();
     }
+  }, []);
 
-    fetchUser()
-    console.log("Usuario encontrado:", referral_name)
+  useEffect(() => {
+    if (referral_name) {
+      console.log("Usuario encontrado:", referral_name);
+    }
+  }, [referral_name]);
 
-  }, [])
   
   useEffect(() => {
     if (status === "success") {

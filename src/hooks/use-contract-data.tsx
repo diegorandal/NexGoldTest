@@ -22,7 +22,7 @@ export const useContractData = () => {
     availableBalance: "0.0",
     lockinEndDate: null as Date | null,
     lastMiningRewardUpdateTime: 0,
-    stakingAPY: "0",
+    stakingAPY: 0,
     isLoading: true,
   })
 
@@ -64,8 +64,7 @@ export const useContractData = () => {
           address: NEX_GOLD_STAKING_ADDRESS,
           abi: NEX_GOLD_STAKING_ABI,
           functionName: "STAKING_APY_BPS",
-          args: [],
-        }) as unknown as String
+        }) as unknown as bigint
       ])
 
 
@@ -76,7 +75,7 @@ export const useContractData = () => {
         stakingRewards: formatEther(stakingRewards),
         miningRewards: formatEther(miningRewards),
         availableBalance: formatEther(availableBalance),
-        stakingAPY: (Number(stakingAPY) / 1e16).toFixed(2), // Convertir de BPS a porcentaje
+        stakingAPY: Number(stakingAPY), // Convertir de BPS a porcentaje
         isLoading: false,
       })
 

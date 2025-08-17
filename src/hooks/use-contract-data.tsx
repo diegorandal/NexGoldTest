@@ -65,7 +65,7 @@ export const useContractData = () => {
           abi: NEX_GOLD_STAKING_ABI,
           functionName: "STAKING_APY_BPS",
           args: [],
-        }) as unknown as bigint,
+        }) as unknown as String
       ])
 
 

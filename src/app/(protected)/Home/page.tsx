@@ -105,76 +105,79 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   }
 
 return (
-        <div className="animate-fade-in">
-            <Card className="space-y-4">
-                {contractDataRef.isLoading ? (
-                    <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
-                ) : (
-                    <>
-                        <div className="text-center mb-4"><p className="text-sm text-gray-300">Mis Referidos</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardCount}</p></div>
-                        <div className="text-center mb-4"><p className="text-sm text-gray-300">Recompensa por referido</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardAmount} NXG</p></div>
-                        <div className="text-center mb-4"><p className="text-sm text-gray-300">Referido por:</p><p className="text-xl font-bold text-white">{referral_name ? referral_name : "Nadie"}</p></div>
+    <div className="animate-fade-in">
+        <Card className="space-y-4">
+            {contractDataRef.isLoading ? (
+                <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
+            ) : (
+                <>
+                    <div className="text-center mb-4"><p className="text-sm text-gray-300">Mis Referidos</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardCount}</p></div>
+                    <div className="text-center mb-4"><p className="text-sm text-gray-300">Recompensa por referido</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardAmount} NXG</p></div>
+                    <div className="text-center mb-4"><p className="text-sm text-gray-300">Referido por:</p><p className="text-xl font-bold text-white">{referral_name ? referral_name : "Nadie"}</p></div>
 
-                        {/* Renderizado condicional para la caja de entrada y el botón */}
-                        {contractDataRef.canReward && !referral_name && (
-                            <div className="flex flex-col space-y-4">
-                                <label className="text-gray-300 text-sm">Dirección a recompensar:</label>
-                                <input
-                                    type="text"
-                                    value={rewardAddress}
-                                    onChange={(e) => setRewardAddress(e.target.value)}
-                                    placeholder="0x..."
-                                    className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-                                />
-                            </div>
-                          )}
-                          {contractDataRef.canReward && (
-                            <div>
-                                <GoldButton onClick={handleSendRewardWithAddress} className="w-full" disabled={isProcessing || (!rewardAddress || !referral_name)}>
-                                    Enviar recompensa
-                                </GoldButton>
-                            </div>
-                        )}
-                        {/* Botón de copiar enlace siempre visible */}
+                    {/* Lógica para mostrar la caja de entrada si no hay un referido */}
+                    {contractDataRef.canReward && !referral_name && (
                         <div className="flex flex-col space-y-4">
-                            <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
+                            <label className="text-gray-300 text-sm">Dirección a recompensar:</label>
+                            <input
+                                type="text"
+                                value={rewardAddress}
+                                onChange={(e) => setRewardAddress(e.target.value)}
+                                placeholder="0x..."
+                                className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                            />
                         </div>
-                    </>
-                )}
-                <div className="h-10 text-center text-sm flex items-center justify-center">
-                    {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
-                    {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
-                    {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
-                </div>
-                <BackButton onClick={onBack} />
-            </Card>
-
-            {/* Nueva Card para el TOP 3 */}
-            <Card className="mt-8 space-y-4 animate-fade-in">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2>
-                </div>
-                {contractDataRef.isLoading ? (
-                    <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
-                ) : (
-                    <div className="space-y-2">
-                        {contractDataRef.top3Addresses.map((address, index) => (
-                            <div
-                                key={index}
-                                className="flex justify-between items-center text-white p-2 rounded-lg"
-                                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                    )}
+                    
+                    {/* Botones de acción. El botón de recompensa ahora usa la misma lógica. */}
+                    <div className="flex flex-col space-y-4">
+                        {/* El botón de recompensa se muestra si el usuario puede recompensar */}
+                        {contractDataRef.canReward && (
+                            <GoldButton 
+                                onClick={handleSendReward} 
+                                className="w-full" 
+                                disabled={isProcessing || (!referral_name && !rewardAddress)}
                             >
-                                <p className="font-bold text-lg">{index + 1}.</p>
-                                <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
-                                <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
-                            </div>
-                        ))}
+                                Enviar recompensa
+                            </GoldButton>
+                        )}
+                        <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
                     </div>
-                )}
-            </Card>
-        </div>
-    );
-  
+                </>
+            )}
+            <div className="h-10 text-center text-sm flex items-center justify-center">
+                {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
+                {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
+                {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
+            </div>
+            <BackButton onClick={onBack} />
+        </Card>
+
+        {/* Nueva Card para el TOP 3 */}
+        <Card className="mt-8 space-y-4 animate-fade-in">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2>
+            </div>
+            {contractDataRef.isLoading ? (
+                <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
+            ) : (
+                <div className="space-y-2">
+                    {contractDataRef.top3Addresses.map((address, index) => (
+                        <div
+                            key={index}
+                            className="flex justify-between items-center text-white p-2 rounded-lg"
+                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                        >
+                            <p className="font-bold text-lg">{index + 1}.</p>
+                            <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
+                            <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </Card>
+    </div>
+);
 
 
 };

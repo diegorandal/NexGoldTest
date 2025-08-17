@@ -68,12 +68,6 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     if (status === "success") { fetchContractDataRef() }
   }, [status, fetchContractDataRef])
 
-  const handleSendRewardWithAddress = () => {
-    // Llama a la función original de recompensa con la nueva dirección
-    setReferral(rewardAddress);
-    handleSendReward();
-  };
-
   //manejo del boton copiar link de referido
   const handleCopyReferralLink = async () => {
     if (!session?.user?.walletAddress) return
@@ -86,17 +80,20 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   }
 
-  //manejo del boton enviar recompensa
+// manejo del boton enviar recompensa
   const handleSendReward = async () => {
-    if (!referral) return
-    if (!referral_name) { console.error("Usuario no encontrado"); return }
+    const addressToSend = referral || rewardAddress; // <-- Lógica unificada: usa referral si existe, si no usa rewardAddress
+    if (!addressToSend) {
+      console.error("No hay una dirección para recompensar.");
+      return;
+    }
     try {
       await sendTransaction({
         transaction: [{
           address: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI as any,
           functionName: "rewardUser",
-          args: [referral],
+          args: [addressToSend], // <-- Usa la dirección unificada
         }],
       });
     } catch (error) {
@@ -116,27 +113,25 @@ return (
                     <div className="text-center mb-4"><p className="text-sm text-gray-300">Referido por:</p><p className="text-xl font-bold text-white">{referral_name ? referral_name : "Nadie"}</p></div>
 
                     {/* Lógica para mostrar la caja de entrada si no hay un referido */}
-                    {contractDataRef.canReward && !referral_name && (
+                    {contractDataRef.canReward && !referral && ( // <-- Usa 'referral' para determinar si mostrar el input
                         <div className="flex flex-col space-y-4">
                             <label className="text-gray-300 text-sm">Dirección a recompensar:</label>
                             <input
                                 type="text"
                                 value={rewardAddress}
-                                onChange={(e) => setRewardAddress(e.target.value)}
+                                onChange={(e) => setRewardAddress(e.target.value)} // <-- Actualiza 'rewardAddress'
                                 placeholder="0x..."
                                 className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500"
                             />
                         </div>
                     )}
                     
-                    {/* Botones de acción. El botón de recompensa ahora usa la misma lógica. */}
                     <div className="flex flex-col space-y-4">
-                        {/* El botón de recompensa se muestra si el usuario puede recompensar */}
                         {contractDataRef.canReward && (
                             <GoldButton 
                                 onClick={handleSendReward} 
                                 className="w-full" 
-                                disabled={isProcessing || (!referral_name && !rewardAddress)}
+                                disabled={isProcessing || (!referral && !rewardAddress)}
                             >
                                 Enviar recompensa
                             </GoldButton>

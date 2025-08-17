@@ -15,6 +15,11 @@
 				"internalType": "address",
 				"name": "initialOwner",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_initialAPY_BPS",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -103,6 +108,25 @@
 			}
 		],
 		"name": "Staked",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "oldAPY",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newAPY",
+				"type": "uint256"
+			}
+		],
+		"name": "StakingAPYUpdated",
 		"type": "event"
 	},
 	{
@@ -282,6 +306,19 @@
 	{
 		"inputs": [],
 		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_newAPY_BPS",
+				"type": "uint256"
+			}
+		],
+		"name": "setStakingAPY",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

@@ -6,7 +6,7 @@ import { worldchain } from "viem/chains"
 import { useSession } from "next-auth/react"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 
-const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
+const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 
 const publicClient = createPublicClient({
   chain: worldchain,
@@ -22,6 +22,7 @@ export const useContractData = () => {
     availableBalance: "0.0",
     lockinEndDate: null as Date | null,
     lastMiningRewardUpdateTime: 0,
+    stakingAPY: "0",
     isLoading: true,
   })
 
@@ -30,10 +31,11 @@ export const useContractData = () => {
 
     setContractData((prev) => ({ ...prev, isLoading: true }))
     try {
+        //address de NXG
         const contractAddress = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC" as `0x${string}`;
         const walletAddress = session.user.walletAddress as `0x${string}`;
 
-        const [staker, stakingRewards, miningRewards, availableBalance] = await Promise.all([
+        const [staker, stakingRewards, miningRewards, availableBalance, stakingAPY] = await Promise.all([
         publicClient.readContract({
           address: NEX_GOLD_STAKING_ADDRESS,
           abi: NEX_GOLD_STAKING_ABI,
@@ -58,6 +60,12 @@ export const useContractData = () => {
           functionName: "balanceOf",
           args: [walletAddress],
         }) as unknown as bigint,
+        publicClient.readContract({
+          address: NEX_GOLD_STAKING_ADDRESS,
+          abi: NEX_GOLD_STAKING_ABI,
+          functionName: "STAKING_APY_BPS",
+          args: [],
+        }) as unknown as bigint,
       ])
 
       setContractData({
@@ -67,6 +75,7 @@ export const useContractData = () => {
         stakingRewards: formatEther(stakingRewards),
         miningRewards: formatEther(miningRewards),
         availableBalance: formatEther(availableBalance),
+        stakingAPY: (Number(stakingAPY) / 1e16).toFixed(2), // Convertir de BPS a porcentaje
         isLoading: false,
       })
     } catch (e) {

@@ -247,7 +247,7 @@ export default function HomePage() {
         }}
       >
         <div 
-          className="w-full max-w-md mx-auto flex flex-col pb-28"
+          className="w-full max-w-md mx-auto flex flex-col pb-20"
           style={{minHeight: 'calc(100vh - 4rem)'}} 
         >
           {activeSection === "dashboard" ? (
@@ -260,10 +260,11 @@ export default function HomePage() {
                   📈 Staking & Mining
                 </GoldButton>
               </div>
-              <div className="mt-auto pt-4">
-                <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
-                  👥 Referidos
-                </GoldButton>
+              <div className="mt-auto pt-4 flex justify-center">
+                <button onClick={() => setActiveSection("referral")} className="flex items-center justify-center text-yellow-400 font-medium transition-transform duration-200 hover:scale-110">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Referidos
+                </button>
               </div>
             </>
           ) : activeSection === "staking" ? (

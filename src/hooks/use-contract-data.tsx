@@ -75,7 +75,7 @@ export const useContractData = () => {
         stakingRewards: formatEther(stakingRewards),
         miningRewards: formatEther(miningRewards),
         availableBalance: formatEther(availableBalance),
-        stakingAPY: Number(stakingAPY), // Convertir de BPS a porcentaje
+        stakingAPY: Number(stakingAPY),
         isLoading: false,
       })
 

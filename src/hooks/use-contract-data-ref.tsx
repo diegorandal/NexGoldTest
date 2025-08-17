@@ -44,7 +44,7 @@ export const useContractDataRef = () => {
       ])
 
       setContractDataRef({
-        rewardAmount: amount.toString(),
+        rewardAmount: formatEther(amount).toString(),
         rewardCount: count.toString(),
         isLoading: false,
       })

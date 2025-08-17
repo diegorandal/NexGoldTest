@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { createPublicClient, http, formatEther } from "viem"
 import { worldchain } from "viem/chains"
 import { useSession } from "next-auth/react"
+import { MiniKit } from "@worldcoin/minikit-js"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
@@ -50,10 +51,20 @@ export const useContractDataRef = () => {
         }) as unknown as [string[], bigint[]],
       ])
 
+
+      // obtener los nombres de usuario
+      const top3Addresses = top3[0];
+      const top3Usernames = await Promise.all(
+        top3Addresses.map(async (address) => {
+          const user = await MiniKit.getUserByAddress(address);
+            return user?.username ?? address; 
+        })
+      );
+
       setContractDataRef({
         rewardAmount: formatEther(amount).toString(),
         rewardCount: count.toString(),
-        top3Addresses: top3[0],
+        top3Addresses: top3Usernames, 
         top3Counts: top3[1].map(count => count.toString()),
         isLoading: false,
       })

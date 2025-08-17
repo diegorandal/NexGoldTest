@@ -14,7 +14,7 @@ import { useContractDataRef } from "@/hooks/use-contract-data-ref"
 import { MiniKit } from "@worldcoin/minikit-js"
 
 const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
-const NEX_GOLD_REFERRAL_ADDRESS = "0xa5957cf7f7eacaa3a695df6ffc8cf5e4989aa879"
+const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {

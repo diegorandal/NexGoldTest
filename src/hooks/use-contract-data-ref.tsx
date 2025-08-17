@@ -6,7 +6,7 @@ import { worldchain } from "viem/chains"
 import { useSession } from "next-auth/react"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 
-const NEX_GOLD_REFERRAL_ADDRESS = "0xa5957cf7f7eacaa3a695df6ffc8cf5e4989aa879"
+const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 
 const publicClient = createPublicClient({
   chain: worldchain,

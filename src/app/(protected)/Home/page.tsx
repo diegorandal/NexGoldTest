@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, type FC, useCallback } from "react"
-import { parseEther } from "viem"
+import { parseEther, getAddress, formatEther } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
+import { Info, Loader, CheckCircle, XCircle, History } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
@@ -16,24 +16,22 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-const WORLDSCAN_API_URL = 'https://www.worldscan.io/api';
+const WORLDSCAN_API_URL = 'https://www.worldscan.org/api'; // <-- CORREGIDO
 
-// Definición del tipo de objeto para una transacción
 interface Transaction {
     hash: string;
     value: string;
     to: string;
+    from: string;
     timeStamp: string;
-    // Puedes añadir más propiedades si las necesitas, como 'from', 'tokenName', etc.
 }
 
-// Hook personalizado para obtener datos de la billetera
 const useWalletData = () => {
     const { data: session } = useSession();
-    const walletAddress = session?.user?.walletAddress;
+    const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const YOUR_API_KEY_HERE = 'ECJ53PB4AE2A7QXR1ZH4VPJH4Z8TG9UX8B'; 
 
     const fetchWalletData = useCallback(async () => {
@@ -41,7 +39,6 @@ const useWalletData = () => {
             setIsLoading(false);
             return;
         }
-
         setIsLoading(true);
         setError(null);
         try {
@@ -59,8 +56,8 @@ const useWalletData = () => {
             } else {
                 throw new Error(data.message || 'Error al obtener las transacciones');
             }
-        } catch (e) {
-            console.error('No se pudieron cargar los datos.');
+        } catch (e: any) {
+            setError(e.message || 'No se pudieron cargar los datos.');
         } finally {
             setIsLoading(false);
         }
@@ -75,7 +72,6 @@ const useWalletData = () => {
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
-
   useEffect(() => {
     if (!lastUpdateTime || lastUpdateTime === 0 || stakedBalance <= 0) {
       setDisplayReward(0);
@@ -93,69 +89,57 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
     }, 1000);
     return () => clearInterval(interval);
   }, [lastUpdateTime, stakedBalance]);
-
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
 
 const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions, isLoading, error } = useWalletData();
+  const { data: session } = useSession();
+  const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
 
-      return (
-        <div className="animate-fade-in p-4">
-            <Card className="space-y-4 bg-gray-900 text-white rounded-xl shadow-lg">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-yellow-400">Historial de Transacciones</h2>
-                    <button
-                        onClick={onBack}
-                        className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors"
-                    >
-                        {/* Asumiendo que hay un ícono de flecha atrás */}
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                </div>
-
-                {isLoading ? (
-                    <div className="text-center text-yellow-400 p-4">
-                        <Loader className="animate-spin inline-block mr-2" /> Cargando datos...
-                    </div>
-                ) : error ? (
-                    <div className="text-center text-red-400 p-4">
-                        <XCircle className="inline-block mr-2" /> Error: {error}
-                    </div>
-                ) : transactions.length > 0 ? (
-                    <div className="space-y-4 max-h-96 overflow-y-auto">
-                        {transactions.map((tx) => (
-                            <div key={tx.hash} className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <div className="flex-1">
-                                    <p className="font-bold text-yellow-400 break-all">{parseFloat(tx.value) / 10**18} NXG</p>
-                                    <p className="text-sm text-gray-400 break-all">A: {tx.to}</p>
-                                </div>
-                                <div className="mt-2 md:mt-0 md:ml-4 text-right">
-                                    <p className="text-xs text-gray-500">{new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}</p>
-                                    <a
-                                        href={`https://worldscan.io/tx/${tx.hash}`} // Reemplaza con la URL real de tu explorador de bloques
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-yellow-400 text-sm hover:underline"
-                                    >
-                                        Ver Transacción
-                                    </a>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center text-gray-400 p-4">
-                        <p>No se encontraron transacciones.</p>
-                    </div>
-                )}
-            </Card>
+  const TransactionItem: FC<{ tx: Transaction }> = ({ tx }) => {
+    if (!walletAddress) return null;
+    const isIncoming = getAddress(tx.to) === getAddress(walletAddress);
+    const amount = parseFloat(formatEther(BigInt(tx.value))).toFixed(4);
+    const date = new Date(parseInt(tx.timeStamp) * 1000).toLocaleString();
+    let type = isIncoming ? 'Recibido' : 'Enviado';
+    if (getAddress(tx.from) === NEX_GOLD_STAKING_ADDRESS) {
+        type = isIncoming ? 'Recompensa / Unstake' : 'Stake';
+    }
+    return (
+      <div className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="flex-1">
+            <p className={`font-bold break-all ${isIncoming ? 'text-green-400' : 'text-red-400'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
+            <p className="text-sm text-gray-400 break-all">{isIncoming ? `De: ${tx.from.slice(0,6)}...${tx.from.slice(-4)}` : `A: ${tx.to.slice(0,6)}...${tx.to.slice(-4)}`}</p>
         </div>
+        <div className="mt-2 md:mt-0 md:ml-4 text-right">
+            <p className="text-xs text-gray-500">{date}</p>
+            <a href={`https://worldscan.org/tx/${tx.hash}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 text-sm hover:underline">
+                Ver Transacción
+            </a>
+        </div>
+      </div>
     );
+  };
 
-}
+  return (
+    <div className="animate-fade-in">
+        <Card className="space-y-4">
+            <h2 className="text-xl font-bold text-yellow-400 text-center">Historial de Transacciones</h2>
+            {isLoading ? (
+                <div className="text-center text-yellow-400 p-4"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
+            ) : error ? (
+                <div className="text-center text-red-400 p-4"><XCircle className="inline-block mr-2" /> {error}</div>
+            ) : transactions.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">{transactions.map((tx) => (<TransactionItem key={tx.hash} tx={tx} />))}</div>
+            ) : (
+                <div className="text-center text-gray-400 p-4"><p>No se encontraron transacciones.</p></div>
+            )}
+            <BackButton onClick={onBack} />
+        </Card>
+    </div>
+  );
+};
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
@@ -182,7 +166,6 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     if (status === "success") { fetchContractDataRef() }
   }, [status, fetchContractDataRef])
 
-  //manejo del boton copiar link de referido
   const handleCopyReferralLink = async () => {
     if (!session?.user?.walletAddress) return
     const ref = session.user.walletAddress
@@ -194,9 +177,8 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   }
 
-// manejo del boton enviar recompensa
   const handleSendReward = async () => {
-    const addressToSend = referral || rewardAddress; // <-- Lógica unificada: usa referral si existe, si no usa rewardAddress
+    const addressToSend = referral || rewardAddress;
     if (!addressToSend) {
       console.error("No hay una dirección para recompensar.");
       return;
@@ -207,7 +189,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
           address: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI as any,
           functionName: "rewardUser",
-          args: [addressToSend], // <-- Usa la dirección unificada
+          args: [addressToSend],
         }],
       });
     } catch (error) {
@@ -215,7 +197,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   }
 
-return (
+  return (
     <div className="animate-fade-in">
         <Card className="space-y-4">
             {contractDataRef.isLoading ? (
@@ -225,31 +207,14 @@ return (
                     <div className="text-center mb-4"><p className="text-sm text-gray-300">Mis Referidos</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardCount}</p></div>
                     <div className="text-center mb-4"><p className="text-sm text-gray-300">Recompensa por referido</p><p className="text-3xl font-bold text-yellow-400">{contractDataRef.rewardAmount} NXG</p></div>
                     <div className="text-center mb-4"><p className="text-sm text-gray-300">Referido por:</p><p className="text-xl font-bold text-white">{referral_name ? referral_name : "Nadie"}</p></div>
-
-                    {/* Lógica para mostrar la caja de entrada si no hay un referido */}
-                    {contractDataRef.canReward && !referral && ( // <-- Usa 'referral' para determinar si mostrar el input
+                    {contractDataRef.canReward && !referral && (
                         <div className="flex flex-col space-y-4">
                             <label className="text-gray-300 text-sm">Dirección a recompensar:</label>
-                            <input
-                                type="text"
-                                value={rewardAddress}
-                                onChange={(e) => setRewardAddress(e.target.value)} // <-- Actualiza 'rewardAddress'
-                                placeholder="0x..."
-                                className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-                            />
+                            <input type="text" value={rewardAddress} onChange={(e) => setRewardAddress(e.target.value)} placeholder="0x..." className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500" />
                         </div>
                     )}
-                    
                     <div className="flex flex-col space-y-4">
-                        {contractDataRef.canReward && (
-                            <GoldButton 
-                                onClick={handleSendReward} 
-                                className="w-full" 
-                                disabled={isProcessing || (!referral && !rewardAddress)}
-                            >
-                                Enviar recompensa
-                            </GoldButton>
-                        )}
+                        {contractDataRef.canReward && (<GoldButton onClick={handleSendReward} className="w-full" disabled={isProcessing || (!referral && !rewardAddress)}>Enviar recompensa</GoldButton>)}
                         <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
                     </div>
                 </>
@@ -261,22 +226,14 @@ return (
             </div>
             <BackButton onClick={onBack} />
         </Card>
-
-        {/* Nueva Card para el TOP 3 */}
         <Card className="mt-8 space-y-4 animate-fade-in">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2>
-            </div>
+            <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
             {contractDataRef.isLoading ? (
                 <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
             ) : (
                 <div className="space-y-2">
                     {contractDataRef.top3Addresses.map((address, index) => (
-                        <div
-                            key={index}
-                            className="flex justify-between items-center text-white p-2 rounded-lg"
-                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                        >
+                        <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
                             <p className="font-bold text-lg">{index + 1}.</p>
                             <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
                             <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
@@ -286,9 +243,7 @@ return (
             )}
         </Card>
     </div>
-);
-
-
+  );
 };
 
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -300,23 +255,23 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData])
 
   const handleStake = async () => {
-    const value = Number.parseFloat(amount)
-    if (isNaN(value) || value <= 0) return
-    const storedProof = sessionStorage.getItem("worldIdProof")
+    const value = Number.parseFloat(amount);
+    if (isNaN(value) || value <= 0) return;
+    const storedProof = sessionStorage.getItem("worldIdProof");
     if (!storedProof || storedProof === "undefined" || storedProof === "null") {
-      console.error("No hay datos de verificación válidos")
-      return
+      console.error("No hay datos de verificación válidos");
+      return;
     }
-    let verificationProof
+    let verificationProof;
     try {
-      verificationProof = JSON.parse(storedProof)
+      verificationProof = JSON.parse(storedProof);
     } catch (error) {
-      console.error("Error al parsear datos de verificación:", error)
-      return
+      console.error("Error al parsear datos de verificación:", error);
+      return;
     }
     if (!verificationProof || !verificationProof.merkle_root || !verificationProof.nullifier_hash || !verificationProof.proof) {
-      console.error("Datos de verificación incompletos")
-      return
+      console.error("Datos de verificación incompletos");
+      return;
     }
     const nonce = Date.now();
     const now = Math.floor(Date.now() / 1000);
@@ -426,22 +381,21 @@ export default function HomePage() {
         >
           {activeSection === "dashboard" ? (
             <>
-              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
                 <div className="mb-6">
                   <UserInfo />
                 </div>
                 <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
                   📈 Staking & Mining
                 </GoldButton>
-              </div>
-              <div>
                 <GoldButton className="w-full" onClick={() => setActiveSection('history')}>
-                  📜 Historial
+                  <History className="inline-block mr-2" size={20}/>
+                  Historial
                 </GoldButton>
               </div>
               <div className="mt-auto pt-4 flex justify-center">
                 <button onClick={() => setActiveSection("referral")} className="flex items-center justify-center text-yellow-400 font-medium transition-transform duration-200 hover:scale-110">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                    Referidos
                 </button>
               </div>

@@ -50,8 +50,6 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { sendTransaction, status, error } = useMiniKit()
   const isProcessing = status === "pending"
 
-  localStorage.setItem('referrer', ""); //PRUEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
   useEffect(() => {
     const storedReferral = localStorage.getItem('referrer');
     if (storedReferral) {

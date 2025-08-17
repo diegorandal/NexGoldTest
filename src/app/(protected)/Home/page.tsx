@@ -1,12 +1,10 @@
 "use client"
 
-import { useState, useEffect, useCallback, type FC } from "react"
-import { parseEther, getAddress, formatEther } from "viem"
+import { useState, useEffect, type FC } from "react"
+import { parseEther } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle, ArrowDownLeft, ArrowUpRight, RefreshCw, Layers, X, History } from 'lucide-react'
+import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import { createPublicClient, http } from 'viem'
-import { worldchain } from 'viem/chains'
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
@@ -18,48 +16,10 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0x13861894fc9fb57a911fff500c6f460e69cb9ef1"
 const NEX_GOLD_REFERRAL_ADDRESS = "0xa5957cf7f7eacaa3a695df6ffc8cf5e4989aa879"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-const WORLDSCAN_API_URL = 'https://www.worldscan.io/api';
-const ERC20_ABI = [{ "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" }] as const;
-
-const publicClient = createPublicClient({
-  chain: worldchain,
-  transport: http(),
-});
-
-const useWalletData = () => {
-  const { data: session } = useSession();
-  const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchWalletData = useCallback(async () => {
-    if (!walletAddress) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${WORLDSCAN_API_URL}?module=account&action=tokentx&contractaddress=${NEX_GOLD_ADDRESS}&address=${walletAddress}&sort=desc`);
-      if (!response.ok) throw new Error('La respuesta de la red no fue válida');
-      const data = await response.json();
-      if (data.status === "1") setTransactions(data.result);
-      else if (data.message === "No transactions found") setTransactions([]);
-      else throw new Error(data.message || 'Error al obtener las transacciones');
-    } catch (e: any) {
-      setError(e.message || "No se pudieron cargar los datos.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [walletAddress]);
-
-  useEffect(() => {
-    fetchWalletData();
-  }, [fetchWalletData]);
-
-  return { transactions, isLoading, error, fetchWalletData };
-};
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
+
   useEffect(() => {
     if (!lastUpdateTime || lastUpdateTime === 0 || stakedBalance <= 0) {
       setDisplayReward(0);
@@ -77,16 +37,17 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
     }, 1000);
     return () => clearInterval(interval);
   }, [lastUpdateTime, stakedBalance]);
+
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { contractDataRef, fetchContractDataRef } = useContractDataRef();
-  const [referral, setReferral] = useState<string | null>(null);
-  const [referral_name, setReferralName] = useState<string | null>(null);
-  const { data: session } = useSession();
-  const { sendTransaction, status, error } = useMiniKit();
-  const isProcessing = status === "pending";
+  const { contractDataRef, fetchContractDataRef } = useContractDataRef()
+  const [referral, setReferral] = useState<string | null>(null)
+  const [referral_name, setReferralName] = useState<string | null>(null)
+  const { data: session } = useSession()
+  const { sendTransaction, status, error } = useMiniKit()
+  const isProcessing = status === "pending"
 
   useEffect(() => {
     const storedReferral = localStorage.getItem('referrer');
@@ -99,25 +60,25 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
       fetchUser();
     }
   }, []);
-
+  
   useEffect(() => {
     if (status === "success") { fetchContractDataRef() }
-  }, [status, fetchContractDataRef]);
+  }, [status, fetchContractDataRef])
 
   const handleCopyReferralLink = async () => {
-    if (!session?.user?.walletAddress) return;
-    const ref = session.user.walletAddress;
-    const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`;
+    if (!session?.user?.walletAddress) return
+    const ref = session.user.walletAddress
+    const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`
     try {
-      await navigator.clipboard.writeText(enlace);
+      await navigator.clipboard.writeText(enlace)
     } catch (error) {
-      console.error("Error al copiar el enlace de referido:", error);
+      console.error("Error al copiar el enlace de referido:", error)
     }
-  };
-
+  }
+  
   const handleSendReward = async () => {
-    if (!referral) return;
-    if (!referral_name) { console.error("Usuario no encontrado"); return; }
+    if (!referral) return
+    if (!referral_name) { console.error("Usuario no encontrado"); return }
     try {
       await sendTransaction({
         transaction: [{
@@ -128,9 +89,9 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         }],
       });
     } catch (error) {
-      console.error("Error al enviar recompensa:", error);
+      console.error("Error al enviar recompensa:", error)
     }
-  };
+  }
 
   return (
     <div className="animate-fade-in">
@@ -157,31 +118,31 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [amount, setAmount] = useState("");
-  const { sendTransaction, status, error } = useMiniKit();
-  const { contractData, fetchContractData, isLocked } = useContractData();
+  const [amount, setAmount] = useState("")
+  const { sendTransaction, status, error } = useMiniKit()
+  const { contractData, fetchContractData, isLocked } = useContractData()
   const session = useSession();
-  const isProcessing = status === "pending";
-  useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData]);
+  const isProcessing = status === "pending"
+  useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData])
 
   const handleStake = async () => {
-    const value = Number.parseFloat(amount);
-    if (isNaN(value) || value <= 0) return;
-    const storedProof = sessionStorage.getItem("worldIdProof");
+    const value = Number.parseFloat(amount)
+    if (isNaN(value) || value <= 0) return
+    const storedProof = sessionStorage.getItem("worldIdProof")
     if (!storedProof || storedProof === "undefined" || storedProof === "null") {
-      console.error("No hay datos de verificación válidos");
-      return;
+      console.error("No hay datos de verificación válidos")
+      return
     }
-    let verificationProof;
+    let verificationProof
     try {
-      verificationProof = JSON.parse(storedProof);
+      verificationProof = JSON.parse(storedProof)
     } catch (error) {
-      console.error("Error al parsear datos de verificación:", error);
-      return;
+      console.error("Error al parsear datos de verificación:", error)
+      return
     }
     if (!verificationProof || !verificationProof.merkle_root || !verificationProof.nullifier_hash || !verificationProof.proof) {
-      console.error("Datos de verificación incompletos");
-      return;
+      console.error("Datos de verificación incompletos")
+      return
     }
     const nonce = Date.now();
     const now = Math.floor(Date.now() / 1000);
@@ -194,15 +155,15 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         abi: NEX_GOLD_STAKING_ABI,
         functionName: "stake",
         args: [stakeAmount, [[NEX_GOLD_ADDRESS, stakeAmount], nonce, deadline], [NEX_GOLD_STAKING_ADDRESS, stakeAmount], walletAddress, 'PERMIT2_SIGNATURE_PLACEHOLDER_0'],
-      }],
+      }], 
       permit2: [{
         permitted: { token: NEX_GOLD_ADDRESS, amount: stakeAmount },
         nonce: nonce.toString(),
         deadline: deadline.toString(),
         spender: NEX_GOLD_STAKING_ADDRESS,
       }],
-    });
-  };
+    })
+  }
   const handleUnstake = async () => {
     const value = Number.parseFloat(amount);
     if (isNaN(value) || value <= 0) return;
@@ -224,8 +185,8 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         functionName: "claimAllRewards",
         args: [],
       }],
-    });
-  };
+    })
+  }
 
   return (
     <div className="animate-fade-in">
@@ -254,151 +215,66 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         <BackButton onClick={onBack} />
       </Card>
     </div>
-  );
-};
-
-const HistoryModal: FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  transactions: any[];
-  isLoading: boolean;
-  error: string | null;
-  walletAddress: `0x${string}` | undefined;
-  onRefresh: () => void;
-}> = ({ isOpen, onClose, transactions, isLoading, error, walletAddress, onRefresh }) => {
-  if (!isOpen) return null;
-
-  const TransactionIcon: FC<{ type: 'in' | 'out' }> = ({ type }) => {
-    const isIncoming = type === 'in';
-    const Icon = isIncoming ? ArrowDownLeft : ArrowUpRight;
-    return (
-      <div className={`p-2 rounded-full ${isIncoming ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
-        <Icon className={isIncoming ? 'text-green-400' : 'text-red-400'} size={20} />
-      </div>
-    );
-  };
-
-  const TransactionItem: FC<{ tx: any }> = ({ tx }) => {
-    if (!walletAddress) return null;
-    const isIncoming = getAddress(tx.to) === getAddress(walletAddress);
-    const amount = parseFloat(formatEther(BigInt(tx.value))).toFixed(4);
-    const date = new Date(parseInt(tx.timeStamp) * 1000).toLocaleDateString();
-    let type = isIncoming ? 'Recibido' : 'Enviado';
-    if (getAddress(tx.from) === NEX_GOLD_STAKING_ADDRESS) {
-        type = isIncoming ? 'Recompensa / Unstake' : 'Stake';
-    }
-    return (
-      <div className="flex items-center justify-between py-4 px-2 hover:bg-yellow-500/5 rounded-lg transition-colors">
-        <div className="flex items-center gap-4"><TransactionIcon type={isIncoming ? 'in' | 'out'} />
-          <div><p className="font-semibold text-white">{type}</p><p className="text-xs text-gray-400">{date}</p></div>
-        </div>
-        <p className={`font-bold ${isIncoming ? 'text-green-400' : 'text-white'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
-      </div>
-    );
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="w-full max-w-lg bg-gray-900/80 border-2 border-yellow-500/30 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><X size={24} /></button>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Historial de Transacciones</h2>
-          <button onClick={onRefresh} disabled={isLoading} className="text-gray-400 hover:text-white transition disabled:opacity-50"><RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} /></button>
-        </div>
-        <div className="max-h-[60vh] overflow-y-auto pr-2">
-          {isLoading ? (
-            <div className="text-center py-8"><Layers className="animate-spin text-yellow-400 inline-block" /><p className="mt-2 text-gray-300">Cargando...</p></div>
-          ) : error ? (
-            <p className="text-center text-red-400 py-8">{error}</p>
-          ) : transactions.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No se encontraron transacciones.</p>
-          ) : (
-            <div className="divide-y divide-yellow-500/10">{transactions.map(tx => <TransactionItem key={tx.hash} tx={tx} />)}</div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+  )
+}
 
 export default function HomePage() {
-  const { status, data: session } = useSession();
-  const router = useRouter();
-  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral">("dashboard");
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  
-  const { transactions, isLoading: isHistoryLoading, error: historyError, fetchWalletData } = useWalletData();
-  const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
+  const { status } = useSession()
+  const router = useRouter()
+  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral">("dashboard")
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/");
+      router.push("/")
     }
-  }, [status, router]);
+  }, [status, router])
 
-  const goBack = () => setActiveSection("dashboard");
+  const goBack = () => setActiveSection("dashboard")
 
   if (status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center text-yellow-400 bg-gray-900">Cargando...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-yellow-400 bg-gray-900">Cargando...</div>
   }
 
   if (status === "authenticated") {
     return (
-      <>
-        <div
-          className="min-h-screen flex items-start justify-center p-4 pt-8 font-sans"
-          style={{
-            backgroundImage: "url('/background.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
-          }}
+      <div
+        className="min-h-screen flex items-start justify-center p-4 pt-8 font-sans"
+        style={{
+          backgroundImage: "url('/background.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
+        <div 
+          className="w-full max-w-md mx-auto flex flex-col pb-28"
+          style={{minHeight: 'calc(100vh - 4rem)'}} 
         >
-          <div 
-            className="w-full max-w-md mx-auto flex flex-col pb-20"
-            style={{minHeight: 'calc(100vh - 4rem)'}} 
-          >
-            {activeSection === "dashboard" ? (
-              <>
-                <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-                  <div className="mb-2">
-                    <UserInfo />
-                  </div>
-                  <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
-                    📈 Staking & Mining
-                  </GoldButton>
-                  <GoldButton className="w-full" onClick={() => setIsHistoryModalOpen(true)}>
-                    <History className="inline-block mr-2" size={20}/>
-                    Ver Historial
-                  </GoldButton>
+          {activeSection === "dashboard" ? (
+            <>
+              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+                <div className="mb-6">
+                  <UserInfo />
                 </div>
-                <div className="mt-auto pt-4 flex justify-center">
-                  <button onClick={() => setActiveSection("referral")} className="flex items-center justify-center text-yellow-400 font-medium transition-transform duration-200 hover:scale-110">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Referidos
-                  </button>
-                </div>
-              </>
-            ) : activeSection === "staking" ? (
-              <StakingAndMiningSection onBack={goBack} />
-            ) : (
-              <ReferralSection onBack={goBack} />
-            )}
-          </div>
+                <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
+                  📈 Staking & Mining
+                </GoldButton>
+              </div>
+              <div className="mt-auto pt-4">
+                <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
+                  👥 Referidos
+                </GoldButton>
+              </div>
+            </>
+          ) : activeSection === "staking" ? (
+            <StakingAndMiningSection onBack={goBack} />
+          ) : (
+            <ReferralSection onBack={goBack} />
+          )}
         </div>
-
-        <HistoryModal
-          isOpen={isHistoryModalOpen}
-          onClose={() => setIsHistoryModalOpen(false)}
-          transactions={transactions}
-          isLoading={isHistoryLoading}
-          error={historyError}
-          walletAddress={walletAddress}
-          onRefresh={fetchWalletData}
-        />
-      </>
-    );
+      </div>
+    )
   }
 
-  return null;
-          }
+  return null
+}

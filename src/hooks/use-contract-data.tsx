@@ -68,6 +68,7 @@ export const useContractData = () => {
         }) as unknown as bigint,
       ])
 
+
       setContractData({
         stakedBalance: formatEther(staker[0]),
         lockinEndDate: staker[1] > 0 ? new Date(Number(staker[1]) * 1000) : null,
@@ -78,6 +79,9 @@ export const useContractData = () => {
         stakingAPY: (Number(stakingAPY) / 1e16).toFixed(2), // Convertir de BPS a porcentaje
         isLoading: false,
       })
+
+      console.log('apy:', contractData.stakingAPY)
+
     } catch (e) {
       console.error("Error fetching contract data:", e)
       setContractData((prev) => ({ ...prev, isLoading: false }))

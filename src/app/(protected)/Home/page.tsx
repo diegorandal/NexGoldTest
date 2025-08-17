@@ -77,9 +77,9 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const handleCopyReferralLink = async () => {
 
-    if (!session?.user?.username) return
+    if (!session?.user?.walletAddress) return
 
-    const ref = session.user.username
+    const ref = session.user.walletAddress
 
     const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`
 
@@ -97,14 +97,14 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
       console.log("Enviando recompensa a:", referral)
 
       //obtener la wallet del referido
-      const user = await MiniKit.getUserByUsername(referral)
+      const user = await MiniKit.getUserByAddress(referral)
 
       if (!user) {
         console.error("Usuario no encontrado")
         return
       }
-      console.log("Usuario encontrado:", user)
-      
+      console.log("Usuario encontrado:", user.username)
+
       const userAddress = user.walletAddress
       console.log("Dirección del referral:", userAddress)
 

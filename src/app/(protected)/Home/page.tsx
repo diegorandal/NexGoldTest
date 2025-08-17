@@ -247,7 +247,7 @@ export default function HomePage() {
         }}
       >
         <div 
-          className="w-full max-w-md mx-auto flex flex-col pb-20"
+          className="w-full max-w-md mx-auto flex flex-col pb-28"
           style={{minHeight: 'calc(100vh - 4rem)'}} 
         >
           {activeSection === "dashboard" ? (

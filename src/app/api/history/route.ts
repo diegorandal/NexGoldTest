@@ -23,8 +23,6 @@ export async function GET(request: Request) {
     apiUrl.searchParams.append('sort', 'desc');
     apiUrl.searchParams.append('apikey', API_KEY);
 
-    console.log(apiUrl.toString());
-
     const response = await fetch(apiUrl.toString());
 
     if (!response.ok) {

@@ -14,10 +14,8 @@ export default function ReferidoPage() {
     const ref = searchParams.get('ref');
     if (ref) {
       setRefName(ref);
-      
       //guardamos local para poder hacer la transaccion
       localStorage.setItem('referrer', ref);
-      console.log('Referrer:', ref);
     }
 
     router.push("/");

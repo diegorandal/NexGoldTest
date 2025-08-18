@@ -359,7 +359,7 @@ export default function HomePage() {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
   const { contractData } = useContractData()
-  const { canClaimAirdrop, isLoadingAirdrop } = useContractDataAirdrop()
+  const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
   
   const handleClaimAirdrop = async () => {
@@ -372,9 +372,13 @@ export default function HomePage() {
           args: [],
         }],
       })
+
+      fetchAirdropData()
+
     } catch (error) {
       console.error("Error al enviar recompensa:", error)
     }
+
   }
 
   useEffect(() => {
@@ -404,7 +408,7 @@ export default function HomePage() {
           <>
             {/* Card de UserInfo arriba */}
             <div className="w-full max-w-md mx-auto">
-              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
                 <UserInfo />
                 {/* Nuevo div para el balance */}
                 <div className="text-center">

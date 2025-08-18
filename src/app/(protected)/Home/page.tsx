@@ -368,9 +368,10 @@ export default function HomePage() {
   }
 
   if (status === "authenticated") {
+    
     return (
       <div
-        className="min-h-screen flex items-start justify-center p-4 pt-8 font-sans"
+        className="min-h-screen flex flex-col justify-between p-4 font-sans"
         style={{
           backgroundImage: "url('/background.jpg')",
           backgroundSize: "cover",
@@ -378,41 +379,33 @@ export default function HomePage() {
           backgroundAttachment: "fixed",
         }}
       >
-        <div 
-          className="w-full max-w-md mx-auto flex flex-col pb-20"
-          style={{minHeight: 'calc(100vh - 4rem)'}} 
-        >
-          {activeSection === "dashboard" ? (
-            <>
-              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-                <div className="mb-6">
-                  <UserInfo />
-                </div>
-                <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
-                  📈 Staking & Mining
-                </GoldButton>
-                <GoldButton className="w-full" onClick={() => setActiveSection('history')}>
-                  <History className="inline-block mr-2" size={20}/>
-                  Historial
-                </GoldButton>
-              </div>
-              <div className="mt-auto pt-4 flex justify-center">
-                <button onClick={() => setActiveSection("referral")} className="flex items-center justify-center text-yellow-400 font-medium transition-transform duration-200 hover:scale-110">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                   Referidos
-                </button>
-              </div>
-            </>
-          ) : activeSection === "staking" ? (
-            <StakingAndMiningSection onBack={goBack} />
-          ) : activeSection === "history" ? (
-            <HistorySection onBack={goBack} />
-          ) : (
-            <ReferralSection onBack={goBack} />
-          )}
+        {/* Card de UserInfo arriba */}
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+            <UserInfo />
+          </div>
+        </div>
+
+        {/* Card de botones abajo */}
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
+            <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
+              📈 Staking & Mining
+            </GoldButton>
+            <GoldButton className="w-full" onClick={() => setActiveSection("history")}>
+              <History className="inline-block mr-2" size={20} />
+              Historial
+            </GoldButton>
+            <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
+              👥 Referidos
+            </GoldButton>
+          </div>
         </div>
       </div>
-    )
+    );
+
+
+
   }
 
   return null

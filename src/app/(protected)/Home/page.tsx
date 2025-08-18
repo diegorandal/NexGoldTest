@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect, type FC, useCallback } from "react"
-import { parseEther, getAddress, formatEther } from "viem"
+import { parseEther, getAddress, formatEther, defineChain, createPublicClient, http, Address } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle, History } from 'lucide-react'
+import { Info, Loader, CheckCircle, XCircle, History, Gift } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
+import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
@@ -16,6 +17,24 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+const AIRDROP_CONTRACT_ADDRESS: Address = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
+
+const worldchain = defineChain({
+  id: 444444,
+  name: 'World Chain',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://worldchain-mainnet.g.alchemy.com/public'] },
+  },
+  blockExplorers: {
+    default: { name: 'Worldscan', url: 'https://worldscan.io' },
+  },
+});
+
+const publicClient = createPublicClient({
+  chain: worldchain,
+  transport: http(),
+})
 
 interface Transaction {
     hash: string;
@@ -89,8 +108,6 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
 
-// ********************************** HISTORY  ********************************************************
-
 const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions, isLoading, error } = useWalletData();
   const { data: session } = useSession();
@@ -140,8 +157,6 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-// ********************************** REFERRAL  ********************************************************
-
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
   const [referral, setReferral] = useState<string | null>(null)
@@ -187,7 +202,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     try {
       await sendTransaction({
         transaction: [{
-          address: NEX_GOLD_REFERRAL_ADDRESS,
+          to: NEX_GOLD_REFERRAL_ADDRESS,
           abi: NEX_GOLD_REFERRAL_ABI as any,
           functionName: "rewardUser",
           args: [addressToSend],
@@ -246,9 +261,6 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
-
-// ********************************** STAKE & MINING ********************************************************
-
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
   const { sendTransaction, status, error } = useMiniKit()
@@ -284,8 +296,8 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     const walletAddress = session?.data?.user?.walletAddress;
     await sendTransaction({
       transaction: [{
-        address: NEX_GOLD_STAKING_ADDRESS,
-        abi: NEX_GOLD_STAKING_ABI,
+        to: NEX_GOLD_STAKING_ADDRESS,
+        abi: NEX_GOLD_STAKING_ABI as any,
         functionName: "stake",
         args: [stakeAmount, [[NEX_GOLD_ADDRESS, stakeAmount], nonce, deadline], [NEX_GOLD_STAKING_ADDRESS, stakeAmount], walletAddress, 'PERMIT2_SIGNATURE_PLACEHOLDER_0'],
       }], 
@@ -303,7 +315,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     const unstakeAmountInWei = parseEther(amount);
     await sendTransaction({
       transaction: [{
-        address: NEX_GOLD_STAKING_ADDRESS,
+        to: NEX_GOLD_STAKING_ADDRESS,
         abi: NEX_GOLD_STAKING_ABI as any,
         functionName: "unstake",
         args: [unstakeAmountInWei.toString()],
@@ -313,7 +325,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleClaim = async () => {
     await sendTransaction({
       transaction: [{
-        address: NEX_GOLD_STAKING_ADDRESS,
+        to: NEX_GOLD_STAKING_ADDRESS,
         abi: NEX_GOLD_STAKING_ABI as any,
         functionName: "claimAllRewards",
         args: [],
@@ -351,10 +363,84 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   )
 }
 
+const AirdropSection: FC<{ onBack: () => void }> = ({ onBack }) => {
+    const { userAddress, sendTransaction, status, error } = useMiniKit();
+    const [hasClaimed, setHasClaimed] = useState(false);
+    const [isChecking, setIsChecking] = useState(true);
+
+    const isProcessing = status === "pending";
+
+    const checkClaimStatus = useCallback(async () => {
+        if (!userAddress) {
+            setIsChecking(false);
+            return;
+        }
+        try {
+            const claimedStatus = await publicClient.readContract({
+                address: AIRDROP_CONTRACT_ADDRESS,
+                abi: AIRDROP_ABI,
+                functionName: 'hasClaimed',
+                args: [userAddress],
+            }) as boolean;
+            setHasClaimed(claimedStatus);
+        } catch (e) {
+            console.error("Error al verificar el estado del claim:", e);
+        } finally {
+            setIsChecking(false);
+        }
+    }, [userAddress]);
+
+    useEffect(() => {
+        checkClaimStatus();
+    }, [checkClaimStatus]);
+
+    const handleClaimAirdrop = async () => {
+        await sendTransaction({
+            transaction: [{
+                to: AIRDROP_CONTRACT_ADDRESS,
+                abi: AIRDROP_ABI as any,
+                functionName: 'claimTokens',
+                args: [],
+            }],
+        });
+    };
+
+    return (
+        <div className="animate-fade-in">
+            <Card className="space-y-4">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-yellow-400">Airdrop de Bienvenida</h2>
+                    <p className="text-gray-300">¡Reclama 25 DWD por única vez!</p>
+                </div>
+
+                {isChecking ? (
+                    <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Verificando estado...</div>
+                ) : (
+                    <GoldButton 
+                        onClick={handleClaimAirdrop} 
+                        className="w-full"
+                        disabled={isProcessing || hasClaimed}
+                    >
+                        {hasClaimed ? "Tokens Reclamados" : (isProcessing ? "Reclamando..." : "Reclamar 25 DWD")}
+                    </GoldButton>
+                )}
+                
+                <div className="h-10 text-center text-sm flex items-center justify-center">
+                    {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
+                    {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Airdrop reclamado con éxito!</p>}
+                    {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
+                </div>
+                <BackButton onClick={onBack} />
+            </Card>
+        </div>
+    );
+};
+
+
 export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
+  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history" | "airdrop">("dashboard")
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -369,8 +455,6 @@ export default function HomePage() {
   }
 
   if (status === "authenticated") {
-    
-   
     return (
       <div
         className="min-h-screen flex flex-col justify-between p-4 font-sans"
@@ -383,14 +467,11 @@ export default function HomePage() {
       >
         {activeSection === "dashboard" ? (
           <>
-            {/* Card de UserInfo arriba */}
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
                 <UserInfo />
               </div>
             </div>
-
-            {/* Card de botones abajo */}
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
                 <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
@@ -403,6 +484,10 @@ export default function HomePage() {
                 <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
                   👥 Referidos
                 </GoldButton>
+                <GoldButton className="w-full" onClick={() => setActiveSection("airdrop")}>
+                  <Gift className="inline-block mr-2" size={20} />
+                  Reclamar Airdrop
+                </GoldButton>
               </div>
             </div>
           </>
@@ -410,17 +495,13 @@ export default function HomePage() {
           <StakingAndMiningSection onBack={goBack} />
         ) : activeSection === "history" ? (
           <HistorySection onBack={goBack} />
+        ) : activeSection === "airdrop" ? (
+            <AirdropSection onBack={goBack} />
         ) : (
           <ReferralSection onBack={goBack} />
         )}
       </div>
     );
-
-
-
-
   }
-
   return null
 }
-                

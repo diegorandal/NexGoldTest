@@ -356,6 +356,12 @@ export default function HomePage() {
   const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
 
   useEffect(() => {
+    if (status === "authenticated") {
+      fetchContractData();
+    }
+  }, [status, fetchContractData]);
+
+  useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/")
     }

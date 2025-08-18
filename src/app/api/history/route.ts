@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const WORLDSCAN_API_URL = 'https://api.etherscan.io/api';
+const WORLDSCAN_API_URL = 'https://api.etherscan.io/v2/api';
 const API_KEY = 'PMPP1WVTI7PMJT49J5UHAQ3RN339G4KRIY';
 const CHAIN_ID = '480'; 
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC";
@@ -15,12 +15,12 @@ export async function GET(request: Request) {
 
   try {
     const apiUrl = new URL(WORLDSCAN_API_URL);
+    apiUrl.searchParams.append('chainid', CHAIN_ID);
     apiUrl.searchParams.append('module', 'account');
     apiUrl.searchParams.append('action', 'tokentx');
     apiUrl.searchParams.append('contractaddress', NEX_GOLD_ADDRESS);
     apiUrl.searchParams.append('address', walletAddress);
     apiUrl.searchParams.append('sort', 'desc');
-    apiUrl.searchParams.append('chainid', CHAIN_ID);
     apiUrl.searchParams.append('apikey', API_KEY);
 
     console.log(apiUrl.toString());

@@ -234,11 +234,13 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                     )}
                 </>
             )}
-            <div className="h-10 text-center text-sm flex items-center justify-center">
-                {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
-                {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
-                {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
-            </div>
+            {status && (
+                <div className="min-h-10 text-center text-sm flex items-center justify-center">
+                    {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
+                    {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
+                    {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
+                </div>
+            )}
             <BackButton onClick={onBack} />
         </Card>
     </div>

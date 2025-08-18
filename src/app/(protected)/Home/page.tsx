@@ -369,6 +369,7 @@ export default function HomePage() {
 
   if (status === "authenticated") {
     
+   
     return (
       <div
         className="min-h-screen flex flex-col justify-between p-4 font-sans"
@@ -379,30 +380,41 @@ export default function HomePage() {
           backgroundAttachment: "fixed",
         }}
       >
-        {/* Card de UserInfo arriba */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
-            <UserInfo />
-          </div>
-        </div>
+        {activeSection === "dashboard" ? (
+          <>
+            {/* Card de UserInfo arriba */}
+            <div className="w-full max-w-md mx-auto">
+              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
+                <UserInfo />
+              </div>
+            </div>
 
-        {/* Card de botones abajo */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-            <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
-              📈 Staking & Mining
-            </GoldButton>
-            <GoldButton className="w-full" onClick={() => setActiveSection("history")}>
-              <History className="inline-block mr-2" size={20} />
-              Historial
-            </GoldButton>
-            <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
-              👥 Referidos
-            </GoldButton>
-          </div>
-        </div>
+            {/* Card de botones abajo */}
+            <div className="w-full max-w-md mx-auto">
+              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
+                <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
+                  📈 Staking & Mining
+                </GoldButton>
+                <GoldButton className="w-full" onClick={() => setActiveSection("history")}>
+                  <History className="inline-block mr-2" size={20} />
+                  Historial
+                </GoldButton>
+                <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
+                  👥 Referidos
+                </GoldButton>
+              </div>
+            </div>
+          </>
+        ) : activeSection === "staking" ? (
+          <StakingAndMiningSection onBack={goBack} />
+        ) : activeSection === "history" ? (
+          <HistorySection onBack={goBack} />
+        ) : (
+          <ReferralSection onBack={goBack} />
+        )}
       </div>
     );
+
 
 
 

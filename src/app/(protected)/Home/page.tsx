@@ -13,6 +13,7 @@ import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
 import { MiniKit } from "@worldcoin/minikit-js"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
+import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"

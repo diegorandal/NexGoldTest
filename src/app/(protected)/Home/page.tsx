@@ -5,6 +5,8 @@ import { parseEther, getAddress, formatEther } from "viem"
 import { useSession } from "next-auth/react"
 import { Info, Loader, CheckCircle, XCircle, History, Gift } from 'lucide-react'
 import { useRouter } from "next/navigation"
+import { createPublicClient, http } from 'viem'
+import { worldchain } from 'viem/chains'
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import NEX_GOLD_DROP_ABI from "@/abi/NexGoldDropABI.json"
@@ -12,8 +14,6 @@ import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
-import { useWalletData } from "@/hooks/use-wallet-data"
-import { useAirdropData } from "@/hooks/use-airdrop-data"
 import { useTokenPairPrice } from "@/hooks/use-token-pair-price"
 import { MiniKit } from "@worldcoin/minikit-js"
 
@@ -21,6 +21,111 @@ const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_DROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+
+const publicClient = createPublicClient({
+  chain: worldchain,
+  transport: http(),
+});
+
+interface Transaction {
+    hash: string;
+    value: string;
+    to: string;
+    from: string;
+    timeStamp: string;
+}
+
+const useWalletData = () => {
+    const { data: session } = useSession();
+    const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchWalletData = useCallback(async () => {
+        if (!walletAddress) {
+            setIsLoading(false);
+            return;
+        }
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(`/api/history?address=${walletAddress}`);
+            
+            if (!response.ok) {
+                throw new Error('La respuesta de la red no fue válida.');
+            }
+            const data = await response.json();
+            if (data.status === '1') {
+                setTransactions(data.result);
+            } else if (data.message === 'No transactions found') {
+                setTransactions([]);
+            } else {
+                throw new Error(data.message || 'Error al obtener las transacciones');
+            }
+        } catch (e: any) {
+            setError(e.message || 'No se pudieron cargar los datos.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [walletAddress]);
+
+    useEffect(() => {
+        fetchWalletData();
+    }, [fetchWalletData]);
+
+    return { transactions, isLoading, error, fetchWalletData };
+};
+
+const useAirdropData = () => {
+  const { data: session } = useSession();
+  const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
+
+  const [canClaim, setCanClaim] = useState(false);
+  const [claimAmount, setClaimAmount] = useState('0');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkClaimStatus = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [amount, hasAlreadyClaimed] = await publicClient.multicall({
+        contracts: [
+          {
+            address: NEX_GOLD_DROP_ADDRESS,
+            abi: NEX_GOLD_DROP_ABI,
+            functionName: 'welcomeAmount',
+          },
+          {
+            address: NEX_GOLD_DROP_ADDRESS,
+            abi: NEX_GOLD_DROP_ABI,
+            functionName: 'hasClaimed',
+            args: [walletAddress || '0x0'],
+          },
+        ],
+      });
+
+      if (amount.status === 'success') {
+        setClaimAmount(formatEther(amount.result as bigint));
+      }
+      if (hasAlreadyClaimed.status === 'success' && walletAddress) {
+        setCanClaim(!hasAlreadyClaimed.result);
+      } else {
+        setCanClaim(false);
+      }
+    } catch (e) {
+      console.error("Error al verificar el estado del airdrop:", e);
+      setCanClaim(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [walletAddress]);
+
+  useEffect(() => {
+    checkClaimStatus();
+  }, [checkClaimStatus]);
+
+  return { canClaim, claimAmount, isLoading, refetch: checkClaimStatus };
+};
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
@@ -49,7 +154,7 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data: session } = useSession();
   const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
 
-  const TransactionItem: FC<{ tx: any }> = ({ tx }) => {
+  const TransactionItem: FC<{ tx: Transaction }> = ({ tx }) => {
     if (!walletAddress) return null;
     const isIncoming = getAddress(tx.to) === getAddress(walletAddress);
     const amount = parseFloat(formatEther(BigInt(tx.value))).toFixed(4);
@@ -184,7 +289,7 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                 <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
             ) : (
                 <div className="space-y-2">
-                    {contractDataRef.top3Addresses.map((address, index) => (
+                    {contractDataRef.top3Addresses.map((address: string, index: number) => (
                         <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
                             <p className="font-bold text-lg">{index + 1}.</p>
                             <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
@@ -385,8 +490,8 @@ export default function HomePage() {
                   ) : (
                     <Gift className="inline-block mr-2" size={20} />
                   )}
-                  {canClaim ? `Reclamar ${claimAmount} NXG (Airdrop)` : 'Airdrop ya reclamado'}
-                </GoldButton>
+                  {canClaim ? `Reclamar ${claimAmount} DWD (Airdrop)` : 'Airdrop ya reclamado'}
+                </Go-ldButton>
               </div>
             </div>
           </>

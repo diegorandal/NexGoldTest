@@ -9,6 +9,7 @@ import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
+import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
 import { MiniKit } from "@worldcoin/minikit-js"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
@@ -352,9 +353,6 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   )
 }
 
-/*******************************************AIRDROP ****************************************/
-
-
 /*******************************************NXG BALANCE ************************************/
 
 
@@ -363,6 +361,21 @@ export default function HomePage() {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
   const { contractData } = useContractData()
+  const { canClaimAirdrop, isLoadingAirdrop } = useContractDataAirdrop()
+  const { sendTransaction, status: txStatus} = useMiniKit()
+
+  const handleClaimAirdrop = async () => {
+
+      await sendTransaction({
+        transaction: [{
+          address: AIRDROP_ADDRESS,
+          abi: AIRDROP_ADDRESS as any,
+          functionName: "claimTokens",
+          args: [],
+        }],
+      })
+
+  }
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -419,6 +432,18 @@ export default function HomePage() {
                 <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
                   👥 Referidos
                 </GoldButton>
+                {/* Botón para el Airdrop */}
+                {isLoadingAirdrop ? (
+                  <div className="text-center text-yellow-400">
+                    <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
+                  </div>
+                ) : (
+                  canClaimAirdrop && (
+                    <GoldButton className="w-full" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
+                      🎁 Reclamar Airdrop DWD
+                    </GoldButton>
+                  )
+                )}
               </div>
             </div>
           </>

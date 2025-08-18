@@ -108,8 +108,9 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
     if (getAddress(tx.from) === NEX_GOLD_STAKING_ADDRESS) {
         type = isIncoming ? 'Recompensa / Unstake' : 'Stake';
     }
+
     return (
-      <div className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="bg-white/10 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
         <div className="flex-1">
             <p className={`font-bold break-all ${isIncoming ? 'text-green-400' : 'text-red-400'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
             <p className="text-sm text-gray-400 break-all">{isIncoming ? `De: ${tx.from.slice(0,6)}...${tx.from.slice(-4)}` : `A: ${tx.to.slice(0,6)}...${tx.to.slice(-4)}`}</p>
@@ -121,7 +122,7 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
             </a>
         </div>
       </div>
-    );
+    )
   };
 
   return (

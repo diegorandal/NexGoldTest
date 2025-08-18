@@ -363,15 +363,18 @@ export default function HomePage() {
   const { sendTransaction, status: txStatus} = useMiniKit()
   
   const handleClaimAirdrop = async () => {
-
+    try {
       await sendTransaction({
         transaction: [{
           address: AIRDROP_ADDRESS,
           abi: AIRDROP_ABI as any,
           functionName: "claimTokens",
+          args: [],
         }],
       })
-      // y si todo va bien que le salga un cartelito para ir a Destinity
+    } catch (error) {
+      console.error("Error al enviar recompensa:", error)
+    }
   }
 
   useEffect(() => {

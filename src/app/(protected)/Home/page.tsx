@@ -16,7 +16,6 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-const WORLDSCAN_API_URL = 'https://www.worldscan.org/api'; // <-- CORREGIDO
 
 interface Transaction {
     hash: string;
@@ -32,7 +31,6 @@ const useWalletData = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const YOUR_API_KEY_HERE = 'ECJ53PB4AE2A7QXR1ZH4VPJH4Z8TG9UX8B'; 
 
     const fetchWalletData = useCallback(async () => {
         if (!walletAddress) {
@@ -42,9 +40,8 @@ const useWalletData = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(
-                `${WORLDSCAN_API_URL}?module=account&action=tokentx&contractaddress=${NEX_GOLD_ADDRESS}&address=${walletAddress}&sort=desc&apikey=${YOUR_API_KEY_HERE}`
-            );
+            const response = await fetch(`/api/history?address=${walletAddress}`);
+            
             if (!response.ok) {
                 throw new Error('La respuesta de la red no fue válida.');
             }
@@ -413,4 +410,4 @@ export default function HomePage() {
   }
 
   return null
-}
+                  }

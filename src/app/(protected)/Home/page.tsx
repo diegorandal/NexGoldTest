@@ -16,6 +16,7 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
+const { contractData, fetchContractData, isLocked } = useContractData()
 
 interface Transaction {
     hash: string;
@@ -252,7 +253,6 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
   const { sendTransaction, status, error } = useMiniKit()
-  const { contractData, fetchContractData, isLocked } = useContractData()
   const session = useSession();
   const isProcessing = status === "pending"
   useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData])
@@ -386,6 +386,16 @@ export default function HomePage() {
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
                 <UserInfo />
+                {/* Saldo de NEXGOLD */}
+                <div className="text-center">
+                  {isLocked ? (
+                    <p className="text-yellow-400 animate-pulse">Cargando saldo...</p>
+                  ) : (
+                    <p className="text-yellow-300 font-bold">
+                      {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -421,4 +431,5 @@ export default function HomePage() {
   }
 
   return null
-                  }
+
+}

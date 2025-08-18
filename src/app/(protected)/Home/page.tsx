@@ -399,8 +399,7 @@ export default function HomePage() {
                     <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
                   ) : (
                     <>
-                      <p className="text-sm text-gray-300">Balance de Cartera</p>
-                      <p className="text-xl font-bold text-yellow-400">{Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
+                      <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
                     </>
                   )}
                 </div>

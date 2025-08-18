@@ -3,29 +3,19 @@
 import { useState, useEffect, type FC, useCallback } from "react"
 import { parseEther, getAddress, formatEther } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle, History, Gift } from 'lucide-react'
+import { Info, Loader, CheckCircle, XCircle, History } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import { createPublicClient, http } from 'viem'
-import { worldchain } from 'viem/chains'
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
-import NEX_GOLD_DROP_ABI from "@/abi/NexGoldDropABI.json"
 import { Card, InputGold, GoldButton, BackButton, UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
-import { useTokenPairPrice } from "@/hooks/use-token-pair-price"
 import { MiniKit } from "@worldcoin/minikit-js"
 
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
-const NEX_GOLD_DROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
-
-const publicClient = createPublicClient({
-  chain: worldchain,
-  transport: http(),
-});
 
 interface Transaction {
     hash: string;
@@ -77,56 +67,6 @@ const useWalletData = () => {
     return { transactions, isLoading, error, fetchWalletData };
 };
 
-const useAirdropData = () => {
-  const { data: session } = useSession();
-  const walletAddress = session?.user?.walletAddress as `0x${string}` | undefined;
-
-  const [canClaim, setCanClaim] = useState(false);
-  const [claimAmount, setClaimAmount] = useState('0');
-  const [isLoading, setIsLoading] = useState(true);
-
-  const checkClaimStatus = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [amount, hasAlreadyClaimed] = await publicClient.multicall({
-        contracts: [
-          {
-            address: NEX_GOLD_DROP_ADDRESS,
-            abi: NEX_GOLD_DROP_ABI,
-            functionName: 'welcomeAmount',
-          },
-          {
-            address: NEX_GOLD_DROP_ADDRESS,
-            abi: NEX_GOLD_DROP_ABI,
-            functionName: 'hasClaimed',
-            args: [walletAddress || '0x0'],
-          },
-        ],
-      });
-
-      if (amount.status === 'success') {
-        setClaimAmount(formatEther(amount.result as bigint));
-      }
-      if (hasAlreadyClaimed.status === 'success' && walletAddress) {
-        setCanClaim(!hasAlreadyClaimed.result);
-      } else {
-        setCanClaim(false);
-      }
-    } catch (e) {
-      console.error("Error al verificar el estado del airdrop:", e);
-      setCanClaim(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [walletAddress]);
-
-  useEffect(() => {
-    checkClaimStatus();
-  }, [checkClaimStatus]);
-
-  return { canClaim, claimAmount, isLoading, refetch: checkClaimStatus };
-};
-
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
   const [displayReward, setDisplayReward] = useState(0);
   useEffect(() => {
@@ -149,6 +89,8 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
 
+// ********************************** HISTORY  ********************************************************
+
 const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions, isLoading, error } = useWalletData();
   const { data: session } = useSession();
@@ -164,7 +106,7 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
         type = isIncoming ? 'Recompensa / Unstake' : 'Stake';
     }
     return (
-      <div className="bg-black/20 backdrop-blur-sm p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
         <div className="flex-1">
             <p className={`font-bold break-all ${isIncoming ? 'text-green-400' : 'text-red-400'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
             <p className="text-sm text-gray-400 break-all">{isIncoming ? `De: ${tx.from.slice(0,6)}...${tx.from.slice(-4)}` : `A: ${tx.to.slice(0,6)}...${tx.to.slice(-4)}`}</p>
@@ -197,6 +139,8 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
+
+// ********************************** REFERRAL  ********************************************************
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
@@ -274,40 +218,44 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                         {contractDataRef.canReward && (<GoldButton onClick={handleSendReward} className="w-full" disabled={isProcessing || (!referral && !rewardAddress)}>Enviar recompensa</GoldButton>)}
                         <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
                     </div>
+                    <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
+                    {contractDataRef.isLoading ? (
+                        <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
+                    ) : (
+                        <div className="space-y-2">
+                            {contractDataRef.top3Addresses.map((address, index) => (
+                                <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+                                    <p className="font-bold text-lg">{index + 1}.</p>
+                                    <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
+                                    <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
-            <div className="h-10 text-center text-sm flex items-center justify-center">
-                {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
-                {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
-                {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
-            </div>
-            <BackButton onClick={onBack} />
-        </Card>
-        <Card className="mt-8 space-y-4 animate-fade-in">
-            <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
-            {contractDataRef.isLoading ? (
-                <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
-            ) : (
-                <div className="space-y-2">
-                    {contractDataRef.top3Addresses.map((address: string, index: number) => (
-                        <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-                            <p className="font-bold text-lg">{index + 1}.</p>
-                            <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
-                            <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
-                        </div>
-                    ))}
+            {status && (
+                <div className="min-h-10 text-center text-sm flex items-center justify-center">
+                    {status === "pending" && <p className="text-yellow-400 flex items-center gap-2"><Loader className="animate-spin" />Procesando...</p>}
+                    {status === "success" && <p className="text-green-400 flex items-center gap-2"><CheckCircle />¡Éxito!</p>}
+                    {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
                 </div>
             )}
+            <BackButton onClick={onBack} />
         </Card>
     </div>
   );
 };
+
+// ********************************** STAKE & MINING ********************************************************
+
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")
   const { sendTransaction, status, error } = useMiniKit()
-  const { contractData, fetchContractData, isLocked } = useContractData()
   const session = useSession();
   const isProcessing = status === "pending"
+  const { contractData, fetchContractData, isLocked } = useContractData()
+
   useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData])
 
   const handleStake = async () => {
@@ -407,45 +355,22 @@ export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
-  const { price, isLoading: isPriceLoading } = useTokenPairPrice();
-  const { canClaim, claimAmount, isLoading: isAirdropLoading, refetch: refetchAirdropStatus } = useAirdropData();
-  const { sendTransaction, status: txStatus } = useMiniKit();
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/")
     }
   }, [status, router])
-  
-  useEffect(() => {
-    if (txStatus === 'success') {
-        refetchAirdropStatus();
-    }
-  }, [txStatus, refetchAirdropStatus]);
 
   const goBack = () => setActiveSection("dashboard")
-  
-  const handleClaimAirdrop = async () => {
-    await sendTransaction({
-      transaction: [{
-        address: NEX_GOLD_DROP_ADDRESS,
-        abi: NEX_GOLD_DROP_ABI,
-        functionName: 'claimTokens',
-        args: [],
-      }],
-    });
-  };
-
-  const formatPrice = (value: number | null) => {
-    if (value === null) return 'N/A';
-    return `${value.toFixed(6)} WLD`;
-  };
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center text-yellow-400 bg-gray-900">Cargando...</div>
   }
 
   if (status === "authenticated") {
+    
+   
     return (
       <div
         className="min-h-screen flex flex-col justify-between p-4 font-sans"
@@ -458,17 +383,14 @@ export default function HomePage() {
       >
         {activeSection === "dashboard" ? (
           <>
+            {/* Card de UserInfo arriba */}
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6">
-                <div className="flex justify-between items-center">
-                  <UserInfo />
-                  <div className="text-right">
-                    <p className="text-sm text-gray-300">NXG/WLD</p>
-                    {isPriceLoading ? <Loader className="animate-spin text-yellow-400 h-5 w-5 ml-auto" /> : <p className="font-bold text-yellow-400 text-lg">{formatPrice(price)}</p>}
-                  </div>
-                </div>
+                <UserInfo />
               </div>
             </div>
+
+            {/* Card de botones abajo */}
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
                 <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
@@ -481,17 +403,6 @@ export default function HomePage() {
                 <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
                   👥 Referidos
                 </GoldButton>
-                <GoldButton 
-                  onClick={handleClaimAirdrop}
-                  disabled={!canClaim || isAirdropLoading || txStatus === 'pending'}
-                >
-                  {isAirdropLoading ? (
-                    <Loader className="animate-spin inline-block mr-2" size={20} />
-                  ) : (
-                    <Gift className="inline-block mr-2" size={20} />
-                  )}
-                  {canClaim ? `Reclamar ${claimAmount} DWD (Airdrop)` : 'Airdrop ya reclamado'}
-                </Go-ldButton>
               </div>
             </div>
           </>
@@ -504,7 +415,12 @@ export default function HomePage() {
         )}
       </div>
     );
+
+
+
+
   }
 
   return null
 }
+                

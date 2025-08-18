@@ -374,6 +374,7 @@ export default function HomePage() {
       })
 
       fetchAirdropData()
+      // Mostrar enlace a DWD
 
     } catch (error) {
       console.error("Error al enviar recompensa:", error)

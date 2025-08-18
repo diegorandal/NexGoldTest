@@ -89,6 +89,8 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
   return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
 };
 
+// ********************************** HISTORY  ********************************************************
+
 const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { transactions, isLoading, error } = useWalletData();
   const { data: session } = useSession();
@@ -137,6 +139,8 @@ const HistorySection: FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
+
+// ********************************** REFERRAL  ********************************************************
 
 const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const { contractDataRef, fetchContractDataRef } = useContractDataRef()
@@ -214,6 +218,20 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                         {contractDataRef.canReward && (<GoldButton onClick={handleSendReward} className="w-full" disabled={isProcessing || (!referral && !rewardAddress)}>Enviar recompensa</GoldButton>)}
                         <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
                     </div>
+                    <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
+                    {contractDataRef.isLoading ? (
+                        <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
+                    ) : (
+                        <div className="space-y-2">
+                            {contractDataRef.top3Addresses.map((address, index) => (
+                                <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+                                    <p className="font-bold text-lg">{index + 1}.</p>
+                                    <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
+                                    <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
             <div className="h-10 text-center text-sm flex items-center justify-center">
@@ -223,25 +241,11 @@ const ReferralSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
             <BackButton onClick={onBack} />
         </Card>
-        <Card className="mt-8 space-y-4 animate-fade-in">
-            <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
-            {contractDataRef.isLoading ? (
-                <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
-            ) : (
-                <div className="space-y-2">
-                    {contractDataRef.top3Addresses.map((address, index) => (
-                        <div key={index} className="flex justify-between items-center text-white p-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-                            <p className="font-bold text-lg">{index + 1}.</p>
-                            <p className="flex-1 text-sm md:text-md lg:text-lg ml-4 truncate">{address}</p>
-                            <p className="font-bold text-yellow-400">{contractDataRef.top3Counts[index]}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </Card>
     </div>
   );
 };
+
+// ********************************** STAKE & MINING ********************************************************
 
 const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const [amount, setAmount] = useState("")

@@ -363,7 +363,7 @@ export default function HomePage() {
   const { contractData } = useContractData()
   const { canClaimAirdrop, isLoadingAirdrop } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
-
+  
   const handleClaimAirdrop = async () => {
 
       await sendTransaction({

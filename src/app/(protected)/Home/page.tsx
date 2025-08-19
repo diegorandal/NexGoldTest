@@ -263,8 +263,8 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const params = {
     fromToken: 'WLD',
-    toToken: 'USDC',
-    amount: '50',
+    toToken: '0xA3502E3348B549ba45Af8726Ee316b490f308dDC',
+    amount: '0',
   };
 
   const deeplink = getUnoDeeplinkUrl(params);

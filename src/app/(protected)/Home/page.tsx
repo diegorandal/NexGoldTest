@@ -284,7 +284,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
     const nonce = Date.now();
     const now = Math.floor(Date.now() / 1000);
     const deadline = now + 180;
-    const stakeAmount = (value * 1e18).toString();
+    const stakeAmount = parseEther(amount).toString();
     const walletAddress = session?.data?.user?.walletAddress;
     await sendTransaction({
       transaction: [{

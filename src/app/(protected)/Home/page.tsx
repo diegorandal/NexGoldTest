@@ -264,7 +264,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const params = {
     fromToken: 'WLD',
     toToken: '0xA3502E3348B549ba45Af8726Ee316b490f308dDC',
-    amount: '0',
+    amount: '100',
   };
 
   const deeplink = getUnoDeeplinkUrl(params);
@@ -341,8 +341,18 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>
         ) : (
           <>
-            <div className="text-center mb-4"><p className="text-sm text-gray-300">Balance Disponible</p><p className="text-xl font-bold text-yellow-400">{Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p></div>
-            <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG <a href={deeplink} target="_blank" rel="noopener noreferrer">Abrir UNO</a></p></div>
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-300">Balance Disponible</p>
+              <div className="flex justify-center items-center">
+                <p className="text-xl font-bold text-yellow-400 mr-2">
+                  {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG
+                </p>
+                <a href={deeplink} target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110">
+                  <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/buy.png" alt="Comprar en UNO"/>
+                </a>
+              </div>
+            </div>
+            <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG </p></div>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div><p className="text-sm text-gray-300">Recompensas Mining</p><AnimatedMiningRewards lastUpdateTime={contractData.lastMiningRewardUpdateTime} stakedBalance={Number.parseFloat(contractData.stakedBalance)} /></div>
               <div><p className="text-sm text-gray-300">Recompensas Staking (APY/{contractData.stakingAPY / 100}%)</p><p className="text-xl font-bold text-yellow-400">+{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG</p></div>
@@ -351,11 +361,15 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <InputGold type="number" placeholder="Cantidad de NXG" value={amount} onChange={(e: any) => setAmount(e.target.value)} />
             <div className="grid grid-cols-2 gap-4"><GoldButton onClick={handleStake} disabled={isProcessing}>Stake</GoldButton><GoldButton onClick={handleUnstake} disabled={isProcessing || Number.parseFloat(contractData.availableBalance) <= 0}>Unstake</GoldButton></div>
             <GoldButton onClick={handleClaim} className="w-full" disabled={isProcessing || Number.parseFloat(contractData.stakedBalance) <= 0}>Reclamar Recompensas</GoldButton>
-            <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable.🚨 unete a.</p>
-            <a href="https://t.me/+_zr0basq5yQ4ZmIx" target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110">
-            <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/> Unete en Telegram</a>
-            <a href="https://x.com/N3xGold?s=09" target="_blank" rel="noopener noreferrer" className="inline-block transition-transform duration-200 hover:scale-110">
-            <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/> Unete en X</a>
+            <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable. 🚨 unete a</p>
+            <div className="flex justify-center space-x-4 mt-2">
+              <a href="https://t.me/+_zr0basq5yQ4ZmIx" target="_blank" rel="noopener noreferrer" className="inline-block transition-transform duration-200 hover:scale-110">
+                <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/> Telegram
+              </a>
+              <a href="https://x.com/N3xGold?s=09" target="_blank" rel="noopener noreferrer" className="inline-block transition-transform duration-200 hover:scale-110">
+                <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/> Twitter X
+              </a>
+            </div>
           </>
         )}
         <div className="h-10 text-center text-sm flex items-center justify-center">

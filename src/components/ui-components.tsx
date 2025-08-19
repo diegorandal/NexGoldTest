@@ -4,6 +4,23 @@ import type React from "react"
 import { LogOut } from 'lucide-react'
 import { signOut, useSession } from "next-auth/react"
 import { Marble } from "@worldcoin/mini-apps-ui-kit-react"
+import Link from "next/link";
+
+// El componente LinkButton para enlaces
+export const LinkButton: React.FC<{
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+  [key: string]: any;
+}> = ({ href, children, className = "", ...props }) => (
+  <Link
+    href={href}
+    className={`bg-black border-2 border-yellow-500 text-yellow-500 transition-all duration-300 ease-in-out px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 hover:bg-yellow-500 hover:text-black hover:shadow-lg hover:shadow-yellow-500/50 ${className}`}
+    {...props}
+  >
+    {children}
+  </Link>
+);
 
 export const GoldButton: React.FC<any> = ({ children, className = "", ...props }) => (
   <button

@@ -264,7 +264,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const params = {
     fromToken: 'WLD',
     toToken: '0xA3502E3348B549ba45Af8726Ee316b490f308dDC',
-    amount: '100',
+    amount: '0',
   };
 
   const deeplink = getUnoDeeplinkUrl(params);
@@ -347,7 +347,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                 <p className="text-xl font-bold text-yellow-400 mr-2">
                   {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG
                 </p>
-                  <LinkButton href={deeplink}> 🛒 UNO</LinkButton>
+                  <LinkButton href={deeplink}>🛒 UNO</LinkButton>
               </div>
             </div>
             <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG </p></div>
@@ -386,6 +386,7 @@ export default function HomePage() {
   const { contractData } = useContractData()
   const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
+  const [showAirdropLink, setShowAirdropLink] = useState(false);
 
   const handleClaimAirdrop = async () => {
     try {
@@ -399,7 +400,7 @@ export default function HomePage() {
       })
 
       fetchAirdropData()
-      // Mostrar enlace a DWD
+      setShowAirdropLink(true);
 
     } catch (error) {
       console.error("Error al enviar recompensa:", error)
@@ -473,6 +474,10 @@ export default function HomePage() {
                       🎁 Reclamar Airdrop DWD
                     </GoldButton>
                   )
+                )}
+                {/* Renderiza el botón de enlace SOLO si `showAirdropLink` es verdadero */}
+                {showAirdropLink && (
+                  <LinkButton href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944">Abrir Destinity</LinkButton>
                 )}
               </div>
             </div>

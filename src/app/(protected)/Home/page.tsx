@@ -14,6 +14,7 @@ import { MiniKit } from "@worldcoin/minikit-js"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
+import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
 
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
@@ -260,6 +261,14 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
   const isProcessing = status === "pending"
   const { contractData, fetchContractData, isLocked } = useContractData()
 
+  const params = {
+    fromToken: 'WLD',
+    toToken: 'USDC',
+    amount: '50',
+  };
+
+  const deeplink = getUnoDeeplinkUrl(params);
+
   useEffect(() => { if (status === "success") { fetchContractData() } }, [status, fetchContractData])
 
   const handleStake = async () => {
@@ -333,7 +342,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
         ) : (
           <>
             <div className="text-center mb-4"><p className="text-sm text-gray-300">Balance Disponible</p><p className="text-xl font-bold text-yellow-400">{Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p></div>
-            <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG</p></div>
+            <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG <a href={deeplink} target="_blank" rel="noopener noreferrer">Abrir UNO</a></p></div>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div><p className="text-sm text-gray-300">Recompensas Mining</p><AnimatedMiningRewards lastUpdateTime={contractData.lastMiningRewardUpdateTime} stakedBalance={Number.parseFloat(contractData.stakedBalance)} /></div>
               <div><p className="text-sm text-gray-300">Recompensas Staking (APY/{contractData.stakingAPY / 100}%)</p><p className="text-xl font-bold text-yellow-400">+{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG</p></div>
@@ -344,8 +353,9 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <GoldButton onClick={handleClaim} className="w-full" disabled={isProcessing || Number.parseFloat(contractData.stakedBalance) <= 0}>Reclamar Recompensas</GoldButton>
             <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable.🚨 unete a.</p>
             <a href="https://t.me/+_zr0basq5yQ4ZmIx" target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110">
-            <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
-          </a>
+            <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/> Unete en Telegram</a>
+            <a href="https://x.com/N3xGold?s=09" target="_blank" rel="noopener noreferrer" className="inline-block transition-transform duration-200 hover:scale-110">
+            <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/> Unete en X</a>
           </>
         )}
         <div className="h-10 text-center text-sm flex items-center justify-center">
@@ -357,7 +367,9 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
       </Card>
     </div>
   )
+
 }
+/**************************************************** PAGINA HOME ***********************************************/
 
 export default function HomePage() {
   const { status } = useSession()
@@ -366,7 +378,7 @@ export default function HomePage() {
   const { contractData } = useContractData()
   const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
-  
+
   const handleClaimAirdrop = async () => {
     try {
       await sendTransaction({
@@ -467,5 +479,7 @@ export default function HomePage() {
       </div>
     );
 }
+
 return null
+
 }

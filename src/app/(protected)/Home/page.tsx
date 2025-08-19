@@ -347,9 +347,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                 <p className="text-xl font-bold text-yellow-400 mr-2">
                   {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG
                 </p>
-                <a href={deeplink} target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110">
-                  <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/buy.png" alt="Comprar en UNO"/>
-                </a>
+                <a href={deeplink} target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110"> Comprar en UNO</a>
               </div>
             </div>
             <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG </p></div>

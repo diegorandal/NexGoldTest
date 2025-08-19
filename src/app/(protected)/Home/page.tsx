@@ -347,7 +347,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
                 <p className="text-xl font-bold text-yellow-400 mr-2">
                   {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG
                 </p>
-                  <LinkButton href={deeplink}> 💵 UNO</LinkButton>
+                  <LinkButton href={deeplink}> 🛒 UNO</LinkButton>
               </div>
             </div>
             <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG </p></div>
@@ -362,7 +362,7 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable. 🚨 unete a</p>
             <div className="flex justify-center space-x-4 mt-2">
               <LinkButton href={'https://t.me/+_zr0basq5yQ4ZmIx'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>Telegram</LinkButton>
-              <LinkButton href={'https://x.com/N3xGold?s=09'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/> Twitter X</LinkButton>
+              <LinkButton href={'https://x.com/N3xGold?s=09'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>X</LinkButton>
             </div>
           </>
         )}

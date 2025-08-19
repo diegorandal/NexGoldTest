@@ -342,10 +342,12 @@ const StakingAndMiningSection: FC<{ onBack: () => void }> = ({ onBack }) => {
             <InputGold type="number" placeholder="Cantidad de NXG" value={amount} onChange={(e: any) => setAmount(e.target.value)} />
             <div className="grid grid-cols-2 gap-4"><GoldButton onClick={handleStake} disabled={isProcessing}>Stake</GoldButton><GoldButton onClick={handleUnstake} disabled={isProcessing || Number.parseFloat(contractData.availableBalance) <= 0}>Unstake</GoldButton></div>
             <GoldButton onClick={handleClaim} className="w-full" disabled={isProcessing || Number.parseFloat(contractData.stakedBalance) <= 0}>Reclamar Recompensas</GoldButton>
-              <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable.🚨</p>
-              <a href="https://t.me/+_zr0basq5yQ4ZmIx" target="_blank" rel="noopener noreferrer" className="self-center inline-block transition-transform duration-200 hover:scale-110">
-                 <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
-              </a>
+              <p className="flex items-center justify-center text-xs text-yellow-500 text-center pt-2 gap-2">
+  <span>🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable.🚨 unete a</span>
+  <a href="https://t.me/+_zr0basq5yQ4ZmIx" target="_blank" rel="noopener noreferrer" className="inline-block transition-transform duration-200 hover:scale-110 flex-shrink-0">
+    <img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
+  </a>
+</p>
           </>
         )}
         <div className="h-10 text-center text-sm flex items-center justify-center">

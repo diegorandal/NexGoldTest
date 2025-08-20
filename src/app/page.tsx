@@ -6,6 +6,10 @@ import { Verify } from "@/components/Verify"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
+// ▼▼▼ INTERRUPTOR DE MANTENIMIENTO ▼▼▼
+// Ponelo en `true` para bloquear la verificación, o en `false` para que funcione normal.
+const MAINTENANCE_MODE = true;
+
 export default function Page() {
   const { status } = useSession()
   const router = useRouter()
@@ -42,7 +46,18 @@ export default function Page() {
       <>
        {step === "loading" && <p>Conectando...</p>}
        {step === "login" && <AuthButton />}
-       {step === "verify" && <Verify onSuccess={handleVerificationSuccess} />}
+       
+       {/* Lógica de Mantenimiento Aplicada Aquí */}
+       {step === "verify" && (
+          MAINTENANCE_MODE ? (
+            <div className="text-center p-4 bg-yellow-900/50 border border-yellow-400 rounded-lg animate-fade-in">
+              <h2 className="font-bold text-lg mb-2">Mantenimiento</h2>
+              <p className="text-sm">La verificación está temporalmente desactivada. Por favor, vuelve a intentarlo más tarde.</p>
+            </div>
+          ) : (
+            <Verify onSuccess={handleVerificationSuccess} />
+          )
+       )}
       </>
     </main>
   )

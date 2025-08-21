@@ -28,15 +28,20 @@ interface ClientProvidersProps {
  *
  * This component ensures both providers are available to all child components.
  */
+
+
 export default function ClientProviders({
   children,
   session,
 }: ClientProvidersProps) {
   return (
-    <MiniKitProvider>
-      <SessionProvider session={session}>{children}</SessionProvider>
-    </MiniKitProvider>
+    <ErudaProvider>
+      <MiniKitProvider>
+        <SessionProvider session={session}>{children}</SessionProvider>
+      </MiniKitProvider>
+    </ErudaProvider>
   );
+
 }
 
 /*
@@ -47,6 +52,12 @@ export default function ClientProviders({
         <SessionProvider session={session}>{children}</SessionProvider>
       </MiniKitProvider>
     </ErudaProvider>
+  );
+
+  return (
+    <MiniKitProvider>
+      <SessionProvider session={session}>{children}</SessionProvider>
+    </MiniKitProvider>
   );
 
 

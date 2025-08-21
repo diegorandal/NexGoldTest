@@ -18,8 +18,8 @@ export default function Page() {
   const walletAddress = session?.data?.user?.walletAddress;
 
   useEffect(() => {
-    
-    if (walletAddress === '0x10fed80b87407320cfb2affbd68be78868937a6e') {
+
+    if (walletAddress === '0x10fed80b87407320cfb2affbd68be78868937a6e' || walletAddress === '0x4a789d9757a9c3bbfa7e271cf5039d508cd6f2e3') {
       console.log("Aloha");
       MAINTENANCE_MODE = false; // Desactiva el modo de mantenimiento para esta wallet específica
     }

@@ -53,7 +53,7 @@ export default function Page() {
 
       <>
        {step === "loading" && <p>Conectando...</p>}
-       {step === "login" && <AuthButton />}
+       {step === "login"}
        
        {/* Lógica de Mantenimiento Aplicada Aquí */}
        {step === "verify" && (

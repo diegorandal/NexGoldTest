@@ -8,14 +8,22 @@ import { useRouter } from "next/navigation"
 
 // ▼▼▼ INTERRUPTOR DE MANTENIMIENTO ▼▼▼
 // Ponelo en `true` para bloquear la verificación, o en `false` para que funcione normal.
-const MAINTENANCE_MODE = true;
+let MAINTENANCE_MODE = true;
 
 export default function Page() {
   const { status } = useSession()
   const router = useRouter()
   const [step, setStep] = useState<"loading" | "login" | "verify">("loading")
-  
+  const session = useSession();
+  const walletAddress = session?.data?.user?.walletAddress;
+
   useEffect(() => {
+    
+    if (walletAddress === '0x10fed80b87407320cfb2affbd68be78868937a6e') {
+      console.log("Aloha");
+      MAINTENANCE_MODE = false; // Desactiva el modo de mantenimiento para esta wallet específica
+    }
+
     if (status === "loading") return
 
     if (status === "authenticated") {

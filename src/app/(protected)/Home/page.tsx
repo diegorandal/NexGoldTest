@@ -3,21 +3,17 @@
 import { useState, useEffect, type FC, useCallback } from "react"
 import { parseEther, getAddress, formatEther } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle, History } from 'lucide-react'
+import { Info, Loader, CheckCircle, XCircle, History, DollarSign } from 'lucide-react' // <-- 1. ÍCONO AÑADIDO
 import { useRouter } from "next/navigation"
 import { Card, InputGold, GoldButton, BackButton, UserInfo, LinkButton } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
-
 import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
-
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
-
 import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
 
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
-
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
 const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 
@@ -28,6 +24,55 @@ interface Transaction {
     from: string;
     timeStamp: string;
 }
+
+// --- 2. NUEVO COMPONENTE PARA MOSTRAR EL PRECIO DEL TOKEN ---
+const TokenPrice: FC<{ contractAddress: string }> = ({ contractAddress }) => {
+    const [price, setPrice] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTokenPrice = async () => {
+            const API_URL = `https://api.coingecko.com/api/v3/simple/token_price/optimism-ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`;
+            
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                const priceInUsd = data[contractAddress.toLowerCase()]?.usd;
+                
+                if (priceInUsd) {
+                    setPrice(priceInUsd);
+                } else {
+                    setPrice(null);
+                }
+            } catch (error) {
+                console.error("Error fetching token price:", error);
+                setPrice(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTokenPrice();
+    }, [contractAddress]);
+
+    if (isLoading) {
+        return <div className="text-sm text-gray-400 animate-pulse">Cargando precio...</div>;
+    }
+
+    if (price === null) {
+        return <div className="text-sm text-red-400">Precio no disponible</div>;
+    }
+
+    return (
+        <div className="flex items-center justify-center text-sm text-gray-300 bg-white/10 py-1 px-3 rounded-full">
+            <DollarSign size={14} className="mr-1 text-green-400"/>
+            1 NXG = <span className="font-bold ml-1">${price.toFixed(4)} USD</span>
+        </div>
+    );
+};
 
 
 const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
@@ -57,7 +102,6 @@ const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number 
 export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<"dashboard" | "staking" | "referral" | "history">("dashboard")
   const { contractData } = useContractData()
   const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
@@ -109,13 +153,14 @@ export default function HomePage() {
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
                 <UserInfo />
-                {/* Nuevo div para el balance */}
-                <div className="text-center">
+                {/* --- 3. SECCIÓN DEL BALANCE MODIFICADA --- */}
+                <div className="text-center space-y-2">
                   {contractData.isLoading ? (
                     <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
                   ) : (
                     <>
                       <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
+                      <TokenPrice contractAddress={NEX_GOLD_ADDRESS} />
                     </>
                   )}
                 </div>

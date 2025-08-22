@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from "react";
-import { Home, User, Calendar } from "lucide-react";
+import { Contact, House, HeartHandshake, BanknoteArrowDown, History } from "lucide-react";
 
 export const Navigation = () => {
   const [value, setValue] = useState("home");
 
   const tabs = [
-    { key: "home", icon: <Home size={24} />, label: "HOME" },
-    { key: "book", icon: <Calendar size={36} />, label: "BOOK", center: true },
-    { key: "profile", icon: <User size={24} />, label: "PROFILE" },
+    { key: "stake", icon: <BanknoteArrowDown size={24} />, label: "STAKE" },
+    { key: "history", icon: <History size={24} />, label: "HISTORY" },
+    { key: "book", icon: <House size={32} />, label: "BOOK", center: true },
+    { key: "referral", icon: <Contact size={24} />, label: "REFERRAL" },
+    { key: "allies", icon: <HeartHandshake size={24} />, label: "ALLIES" },
   ];
 
   return (

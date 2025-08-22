@@ -28,7 +28,7 @@ const allies = [
 
 export default function AlliesPage() {
     return (
-        <div className="animate-fade-in mx-2 mt-2 mb-60">
+        <div className="animate-fade-in mx-4 mt-4 mb-60">
             <Card className="space-y-4">
                 <h2 className="text-xl font-bold text-yellow-400 text-center">Alianzas</h2>
                 {allies.length > 0 ? (

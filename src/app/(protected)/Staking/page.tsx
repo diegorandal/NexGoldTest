@@ -100,7 +100,7 @@ export default function StakePage() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in mx-4 mt-4 mb-60">
       <Card className="space-y-4">
         {contractData.isLoading ? (
           <div className="text-center text-yellow-400"><Loader className="animate-spin inline-block" /> Cargando datos...</div>

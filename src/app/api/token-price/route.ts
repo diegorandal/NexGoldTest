@@ -27,10 +27,12 @@ export async function GET(request: Request) {
   };
 
   try {
+    
+    console.log("Llamando a Alchemy con URL:", API_URL);
+
     const response = await fetch(API_URL, options);
     const data = await response.json(); 
 
-    
     console.log("Respuesta completa de Alchemy:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {

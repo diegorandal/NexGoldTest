@@ -9,7 +9,6 @@ import { Card, InputGold, GoldButton, BackButton, UserInfo, LinkButton } from "@
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
-import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
 import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
 

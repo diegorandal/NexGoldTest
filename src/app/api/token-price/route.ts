@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const contractAddress = searchParams.get('address');
-  const apiKey = '4lsBH5ulPeZNsitMkxyNfF-zB41XkE2c'; // Tu API Key
+  const apiKey = '4lsBH5ulPeZNsitMkxyNfF-zB41XkE2c'; 
 
   if (!contractAddress) {
     return NextResponse.json({ error: 'Contract address is required' }, { status: 400 });
@@ -19,8 +19,6 @@ export async function GET(request: Request) {
     },
     body: JSON.stringify({
       addresses: [{
-        // OJO: Este endpoint espera una dirección de BILLETERA.
-        // Al pasarle la dirección del token, es probable que devuelva una lista vacía.
         address: contractAddress,
         networks: ["worldchain-mainnet"],
         withPrices: true
@@ -30,9 +28,9 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(API_URL, options);
-    const data = await response.json(); // Leemos la respuesta completa
+    const data = await response.json(); 
 
-    // Log para ver la respuesta de Alchemy en la consola de Vercel
+    
     console.log("Respuesta completa de Alchemy:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
@@ -40,7 +38,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch from Alchemy', details: data }, { status: response.status });
     }
 
-    // CORRECCIÓN: Leemos la respuesta con la estructura correcta que me pasaste
+  
     const tokenList = data?.data?.tokens;
 
     if (!tokenList || tokenList.length === 0) {
@@ -48,7 +46,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Alchemy did not return any tokens for this address' }, { status: 404 });
     }
     
-    // Buscamos tu token específico en la lista que devuelve
+
     const tokenData = tokenList.find(t => t.tokenAddress?.toLowerCase() === contractAddress.toLowerCase());
 
     if (!tokenData || !tokenData.tokenPrices || !tokenData.tokenPrices.prices || tokenData.tokenPrices.prices.length === 0) {

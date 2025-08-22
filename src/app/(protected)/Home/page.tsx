@@ -96,7 +96,7 @@ export default function HomePage() {
   if (status === "authenticated") {
     return (
       <div
-        className="min-h-screen flex flex-col justify-between p-4 font-sans"
+        className="min-h-screen flex flex-col justify-between p-4 pb-24 font-sans"
         style={{
           backgroundImage: "url('/background.jpg')",
           backgroundSize: "cover",

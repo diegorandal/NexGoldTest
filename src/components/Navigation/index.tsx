@@ -15,11 +15,11 @@ export const Navigation = () => {
   const pathname = usePathname(); // Obtiene la ruta actual de la URL
 
   const tabs = [
-    { key: "stake", href: "/stake", icon: BanknoteArrowDown, label: "STAKE" },
-    { key: "history", href: "/history", icon: History, label: "HISTORY" },
-    { key: "book", href: "/", icon: House, label: "BOOK", center: true }, // La ruta principal es "/"
-    { key: "referral", href: "/Referrals", icon: Contact, label: "REFERRAL" }, // Ruta a la nueva página
-    { key: "allies", href: "/allies", icon: HeartHandshake, label: "ALLIES" },
+    { key: "staking", href: "/Staking", icon: BanknoteArrowDown, label: "STAKE" },
+    { key: "history", href: "/History", icon: History, label: "HISTORY" },
+    { key: "home", href: "/Home", icon: House, label: "HOME", center: true },
+    { key: "referral", href: "/Referrals", icon: Contact, label: "REFERRAL" },
+    { key: "allies", href: "/Allies", icon: HeartHandshake, label: "ALLIES" },
   ];
 
   return (

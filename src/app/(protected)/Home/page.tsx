@@ -347,16 +347,6 @@ export default function HomePage() {
             {/* Card de botones abajo */}
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-                <GoldButton className="w-full" onClick={() => setActiveSection("staking")}>
-                  📈 Staking & Mining
-                </GoldButton>
-                <GoldButton className="w-full" onClick={() => setActiveSection("history")}>
-                  <History className="inline-block mr-2" size={20} />
-                  Historial
-                </GoldButton>
-                <GoldButton className="w-full" onClick={() => setActiveSection("referral")}>
-                  👥 Referidos
-                </GoldButton>
                 {/* Botón para el Airdrop */}
                 {isLoadingAirdrop ? (
                   <div className="text-center text-yellow-400">

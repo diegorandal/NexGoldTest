@@ -68,10 +68,6 @@ export default function ReferralsPage() {
         }
     }
 
-    const handleBack = () => {
-        router.back(); // Función para volver a la página anterior
-    }
-
     return (
         <div className="animate-fade-in">
             {/* ... (el resto del JSX, es idéntico) */}
@@ -117,7 +113,6 @@ export default function ReferralsPage() {
                             {status === "error" && <p className="text-red-400 flex items-center gap-2"><XCircle />Error: {error}</p>}
                         </div>
                     )}
-                    <BackButton onClick={handleBack} />
                 </Card>
             </div>
         </div>

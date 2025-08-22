@@ -1,55 +1,77 @@
 'use client';
 
 import { useState } from "react";
-import { Contact, House, HeartHandshake, BanknoteArrowDown, History } from "lucide-react";
+import {
+  Contact,
+  House,
+  HeartHandshake,
+  BanknoteArrowDown,
+  History,
+} from "lucide-react";
 
 export const Navigation = () => {
   const [value, setValue] = useState("home");
 
   const tabs = [
-    { key: "stake", icon: <BanknoteArrowDown size={24} />, label: "STAKE" },
-    { key: "history", icon: <History size={24} />, label: "HISTORY" },
-    { key: "book", icon: <House size={32} />, label: "BOOK", center: true },
-    { key: "referral", icon: <Contact size={24} />, label: "REFERRAL" },
-    { key: "allies", icon: <HeartHandshake size={24} />, label: "ALLIES" },
+    { key: "stake", icon: BanknoteArrowDown, label: "STAKE" },
+    { key: "history", icon: History, label: "HISTORY" },
+    { key: "book", icon: House, label: "BOOK", center: true },
+    { key: "referral", icon: Contact, label: "REFERRAL" },
+    { key: "allies", icon: HeartHandshake, label: "ALLIES" },
   ];
 
   return (
-    <div className="flex justify-around items-center relative bg-black py-2">
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => setValue(tab.key)}
-          className={`flex flex-col items-center justify-center ${
-            tab.center
-              ? "absolute -top-8 rounded-full border-4 border-yellow-400 bg-black w-20 h-20 flex items-center justify-center shadow-lg"
-              : ""
-          }`}
-        >
-          <div
-            className={`${
-              value === tab.key && !tab.center
-                ? "text-yellow-400"
-                : tab.center
-                ? "text-white"
-                : "text-gray-400"
-            }`}
-          >
-            {tab.icon}
-          </div>
-          {!tab.center && (
-            <span
-              className={`text-xs mt-1 ${
-                value === tab.key
-                  ? "text-yellow-400 font-semibold"
-                  : "text-gray-400"
-              }`}
+    <div className="relative bg-black py-2">
+      <div className="grid grid-cols-5 items-center text-center">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+
+          if (tab.center) {
+            const isActive = value === tab.key;
+            return (
+              <div key={tab.key} className="flex justify-center">
+                <button
+                  onClick={() => setValue(tab.key)}
+                  className={`relative -top-6 w-20 h-20 rounded-full border-4 border-yellow-400 bg-black flex items-center justify-center transition-all duration-300 ${
+                    isActive
+                      ? "scale-110 shadow-yellow-400/70 shadow-xl"
+                      : "scale-100 shadow-lg"
+                  }`}
+                >
+                  <Icon
+                    size={32}
+                    className={isActive ? "text-yellow-400" : "text-white"}
+                  />
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setValue(tab.key)}
+              className="flex flex-col items-center justify-center"
             >
-              {tab.label}
-            </span>
-          )}
-        </button>
-      ))}
+              <Icon
+                size={24}
+                className={
+                  value === tab.key ? "text-yellow-400" : "text-gray-400"
+                }
+              />
+              <span
+                className={`text-xs ${
+                  value === tab.key
+                    ? "text-yellow-400 font-semibold"
+                    : "text-gray-400"
+                }`}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

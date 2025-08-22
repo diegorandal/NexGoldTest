@@ -3,52 +3,37 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const contractAddress = searchParams.get('address');
-  
-  // Usamos la API Key que proporcionaste
-  const apiKey = '4lsBH5ulPeZNsitMkxyNfF-zB41XkE2c';
 
   if (!contractAddress) {
     return NextResponse.json({ error: 'Contract address is required' }, { status: 400 });
   }
 
-  const API_URL = `https://worldchain-mainnet.g.alchemy.com/v2/${apiKey}`;
-
-  // Opciones para la solicitud fetch
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: "2.0",
-      method: "alchemy_getTokenMetadata",
-      params: [contractAddress]
-    })
-  };
+  // Usamos la API de DEX Screener, que es la fuente correcta para esto.
+  const API_URL = `https://api.dexscreener.com/latest/dex/tokens/${contractAddress}`;
 
   try {
-    const response = await fetch(API_URL, options);
+    const response = await fetch(API_URL, {
+      next: { revalidate: 60 }, // Cache de 1 minuto para no sobrecargar la API
+    });
 
     if (!response.ok) {
-      // Si la respuesta no es exitosa, intentamos leer el error
       const errorData = await response.json();
-      console.error('API response error from Alchemy:', errorData);
-      return NextResponse.json(
-        { error: 'Failed to fetch from Alchemy', details: errorData },
-        { status: response.status }
-      );
+      console.error('DEX Screener API error:', errorData);
+      return NextResponse.json({ error: 'Failed to fetch from DEX Screener' }, { status: response.status });
     }
 
     const data = await response.json();
-    const price = data.result.price;
+    
+    // Buscamos el primer par de trading que tenga un precio en USD
+    const pairWithPrice = data.pairs?.find(p => p.priceUsd);
 
-    if (price == null) {
+    if (!pairWithPrice) {
       return NextResponse.json({ error: 'Price not found for this token' }, { status: 404 });
     }
+    
+    const price = parseFloat(pairWithPrice.priceUsd);
 
-    // Adaptamos la respuesta al formato que espera el frontend
+    // Adaptamos la respuesta al formato que tu frontend ya espera
     const formattedResponse = {
       [contractAddress.toLowerCase()]: {
         usd: price

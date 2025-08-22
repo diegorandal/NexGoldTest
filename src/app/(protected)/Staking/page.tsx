@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState,type FC, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useMiniKit } from "@/hooks/use-minikit";
 import { useContractData } from "@/hooks/use-contract-data"; 
@@ -99,6 +99,28 @@ export default function StakePage() {
     });
   };
 
+  const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
+    const [displayReward, setDisplayReward] = useState(0);
+    useEffect(() => {
+      if (!lastUpdateTime || lastUpdateTime === 0 || stakedBalance <= 0) {
+        setDisplayReward(0);
+        return;
+      }
+      const MINING_REWARD_RATE = 10;
+      const MINING_INTERVAL_SECONDS = 24 * 60 * 60;
+      const interval = setInterval(() => {
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const timeElapsed = nowSeconds - lastUpdateTime;
+        if (timeElapsed < 0) { setDisplayReward(0); return; }
+        const progressInCycle = (timeElapsed % MINING_INTERVAL_SECONDS) / MINING_INTERVAL_SECONDS;
+        const animatedReward = progressInCycle * MINING_REWARD_RATE;
+        setDisplayReward(animatedReward);
+      }, 1000);
+      return () => clearInterval(interval);
+    }, [lastUpdateTime, stakedBalance]);
+    return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
+  };
+
   return (
     <div className="animate-fade-in mx-4 mt-4 mb-60">
       <Card className="space-y-4">
@@ -117,7 +139,7 @@ export default function StakePage() {
             </div>
             <div className="text-center"><p className="text-lg text-gray-300">Balance en Staking</p><p className="text-3xl font-bold text-white">{Number.parseFloat(contractData.stakedBalance).toFixed(4)} NXG </p></div>
             <div className="grid grid-cols-2 gap-4 text-center">
-              <div><p className="text-sm text-gray-300">Recompensas Mining</p></div>
+              <div><p className="text-sm text-gray-300">Recompensas Mining</p><AnimatedMiningRewards lastUpdateTime={contractData.lastMiningRewardUpdateTime} stakedBalance={Number.parseFloat(contractData.stakedBalance)} /></div>
               <div><p className="text-sm text-gray-300">Recompensas Staking (APY/{contractData.stakingAPY / 100}%)</p><p className="text-xl font-bold text-yellow-400">+{Number.parseFloat(contractData.stakingRewards).toFixed(4)} NXG</p></div>
             </div>
             {contractData.lockinEndDate && Number.parseFloat(contractData.stakedBalance) > 0 && <div className={`text-center p-2 rounded-md text-sm ${isLocked ? "bg-red-900/50 text-red-300" : "bg-green-900/50 text-green-300"}`}><Info className="inline-block mr-2 h-4 w-4" />{isLocked ? `Bloqueado hasta: ${contractData.lockinEndDate.toLocaleString()}` : "Fondos desbloqueados."}</div>}

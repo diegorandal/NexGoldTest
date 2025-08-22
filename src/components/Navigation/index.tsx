@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import { Home, User, Calendar } from "lucide-react";
 
@@ -25,7 +27,7 @@ export const Navigation = () => {
           <div
             className={`${
               value === tab.key && !tab.center
-                ? "text-green-500"
+                ? "text-yellow-400"
                 : tab.center
                 ? "text-white"
                 : "text-gray-400"
@@ -37,7 +39,7 @@ export const Navigation = () => {
             <span
               className={`text-xs mt-1 ${
                 value === tab.key
-                  ? "text-green-500 font-semibold"
+                  ? "text-yellow-400 font-semibold"
                   : "text-gray-400"
               }`}
             >

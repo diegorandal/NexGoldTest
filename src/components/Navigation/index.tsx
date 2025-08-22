@@ -8,16 +8,18 @@ import {
   BanknoteArrowDown,
   History,
 } from "lucide-react";
+import Link from "next/link"; // Importa el componente Link
+import { usePathname } from "next/navigation"; // Importa el hook para obtener la URL
 
 export const Navigation = () => {
-  const [value, setValue] = useState("home");
+  const pathname = usePathname(); // Obtiene la ruta actual de la URL
 
   const tabs = [
-    { key: "stake", icon: BanknoteArrowDown, label: "STAKE" },
-    { key: "history", icon: History, label: "HISTORY" },
-    { key: "book", icon: House, label: "BOOK", center: true },
-    { key: "referral", icon: Contact, label: "REFERRAL" },
-    { key: "allies", icon: HeartHandshake, label: "ALLIES" },
+    { key: "stake", href: "/stake", icon: BanknoteArrowDown, label: "STAKE" },
+    { key: "history", href: "/history", icon: History, label: "HISTORY" },
+    { key: "book", href: "/", icon: House, label: "BOOK", center: true }, // La ruta principal es "/"
+    { key: "referral", href: "/referrals", icon: Contact, label: "REFERRAL" }, // Ruta a la nueva página
+    { key: "allies", href: "/allies", icon: HeartHandshake, label: "ALLIES" },
   ];
 
   return (
@@ -25,13 +27,13 @@ export const Navigation = () => {
       <div className="grid grid-cols-5 items-center text-center">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = value === tab.key;
+          const isActive = pathname === tab.href; // Compara la URL actual con el href del tab
 
           if (tab.center) {
             return (
               <div key={tab.key} className="flex justify-center">
-                <button
-                  onClick={() => setValue(tab.key)}
+                <Link
+                  href={tab.href}
                   className={`relative -top-6 w-20 aspect-square rounded-full border-4 border-yellow-400 bg-black flex items-center justify-center transition-all duration-300 ${
                     isActive
                       ? "scale-110 shadow-yellow-400/70 shadow-xl"
@@ -44,15 +46,15 @@ export const Navigation = () => {
                       isActive ? "text-yellow-400" : "text-white"
                     }`}
                   />
-                </button>
+                </Link>
               </div>
             );
           }
 
           return (
-            <button
+            <Link
               key={tab.key}
-              onClick={() => setValue(tab.key)}
+              href={tab.href}
               className="flex flex-col items-center justify-center transition-all duration-300"
             >
               <Icon
@@ -68,7 +70,7 @@ export const Navigation = () => {
               >
                 {tab.label}
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>

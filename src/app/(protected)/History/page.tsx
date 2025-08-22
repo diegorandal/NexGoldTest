@@ -91,18 +91,19 @@ export default function HistoryPage() {
     };
 
     return (
-        <div className="animate-fade-in">
-            <h2 className="text-xl font-bold text-yellow-400 text-center">Historial de Transacciones</h2>
-            {isLoading ? (
-                <div className="text-center text-yellow-400 p-4"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
-            ) : error ? (
-                <div className="text-center text-red-400 p-4"><XCircle className="inline-block mr-2" /> {error}</div>
-            ) : transactions.length > 0 ? (
-                // Eliminamos max-h-96 y overflow-y-auto para que el contenedor se ajuste al contenido
-                <div className="space-y-4 pr-2">{transactions.map((tx) => (<TransactionItem key={tx.hash} tx={tx} />))}</div>
-            ) : (
-                <div className="text-center text-gray-400 p-4"><p>No se encontraron transacciones.</p></div>
-            )}
+        <div className="animate-fade-in mx-4 mt-4 mb-20">
+            <Card className="space-y-4">
+                <h2 className="text-xl font-bold text-yellow-400 text-center">Historial de Transacciones</h2>
+                {isLoading ? (
+                    <div className="text-center text-yellow-400 p-4"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
+                ) : error ? (
+                    <div className="text-center text-red-400 p-4"><XCircle className="inline-block mr-2" /> {error}</div>
+                ) : transactions.length > 0 ? (
+                    <div className="space-y-4 pr-2">{transactions.map((tx) => (<TransactionItem key={tx.hash} tx={tx} />))}</div>
+                ) : (
+                    <div className="text-center text-gray-400 p-4"><p>No se encontraron transacciones.</p></div>
+                )}
+            </Card>
         </div>
     );
 }

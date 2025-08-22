@@ -1,33 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
 export default function ReferidoPage() {
-  const [refName, setRefName] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     // Lee el parámetro 'ref' de la URL
     const ref = searchParams.get('ref');
     if (ref) {
-      setRefName(ref);
-      //guardamos local para poder hacer la transaccion
+      // Guarda el referente en el almacenamiento local
       localStorage.setItem('referrer', ref);
     }
-
+    
+    // Redirige inmediatamente a la página principal
     router.push("/");
 
-  }, [searchParams]);
+  }, [searchParams, router]);
 
-  return (
-    <div>
-      {refName && <p>Has sido referido por: {refName}</p>}
-      {!refName && <p>No se ha encontrado información del referente.</p>}
-        <p></p>
-        <p>Redirigiendo...</p>
-    </div>
-  );
+  // Devuelve null para evitar que se renderice cualquier contenido
+  return null;
 }

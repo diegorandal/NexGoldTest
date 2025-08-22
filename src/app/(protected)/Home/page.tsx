@@ -93,7 +93,7 @@ export default function HomePage() {
     }
   }, []);
 
-  // Función para saber si puede enviar recompensas de referido
+  // Función para enviar recompensas de referido
   const handleClaimReward = async () => {
     const addressToSend = referral;
     try {

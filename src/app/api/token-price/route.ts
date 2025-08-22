@@ -3,27 +3,27 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const contractAddress = searchParams.get('address');
-  const apiKey = '4lsBH5ulPeZNsitMkxyNfF-zB41XkE2c'; // Tu API Key
+  const apiKey = '4lsBH5ulPeZNsitMkxyNfF-zB41XkE2c';
 
   if (!contractAddress) {
     return NextResponse.json({ error: 'Contract address is required' }, { status: 400 });
   }
 
-  // 1. URL: Cambiamos la URL de "docs-demo" a la de producción.
+  
   const API_URL = 'https://api.g.alchemy.com/data/v1/mainnet/get-tokens-by-address';
 
-  // 2. Options: Usamos la estructura que me pasaste, pero con tus datos.
+
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-alchemy-token': apiKey // La API de producción requiere autenticación aquí
+      'x-alchemy-token': apiKey 
     },
     body: JSON.stringify({
-      // Esta es la estructura que me indicaste
+      
       addresses: [{
-        address: contractAddress,         // AQUÍ SE USA TU CONTRATO
-        networks: ["worldchain-mainnet"], // Tu red
+        address: contractAddress,        
+        networks: ["worldchain-mainnet"],
         withPrices: true
       }]
     })
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 
     const data = await response.json();
     
-    // 3. Procesamos la respuesta que nos da Alchemy
+  
     const tokenData = data.addresses[0]?.tokenPrices?.find(t => t.address.toLowerCase() === contractAddress.toLowerCase());
     
     if (!tokenData || !tokenData.prices || tokenData.prices.length === 0) {
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'USD price not found for this token' }, { status: 404 });
     }
 
-    // Adaptamos la respuesta al formato que tu frontend ya espera
+    
     const formattedResponse = {
       [contractAddress.toLowerCase()]: {
         usd: price

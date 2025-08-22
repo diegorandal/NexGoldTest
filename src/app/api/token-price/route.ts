@@ -47,14 +47,14 @@ export async function GET(request: Request) {
     }
     
 
-    const tokenData = tokenList.find(t => t.tokenAddress?.toLowerCase() === contractAddress.toLowerCase());
+    const tokenData = tokenList.find((t: any) => t.tokenAddress?.toLowerCase() === contractAddress.toLowerCase());
 
     if (!tokenData || !tokenData.tokenPrices || !tokenData.tokenPrices.prices || tokenData.tokenPrices.prices.length === 0) {
         console.log('No se encontró información de precio para el token en la respuesta.');
         return NextResponse.json({ error: 'Price info not found in response for the specific token' }, { status: 404 });
     }
 
-    const priceInfo = tokenData.tokenPrices.prices.find(p => p.currency === 'USD');
+    const priceInfo = tokenData.tokenPrices.prices.find((p: any) => p.currency === 'USD');
     const price = priceInfo ? parseFloat(priceInfo.value) : null;
     
     if (price === null) {

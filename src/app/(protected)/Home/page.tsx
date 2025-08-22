@@ -13,6 +13,7 @@ import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
+import { MiniKit } from "@worldcoin/minikit-js"
 
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
@@ -77,12 +78,26 @@ export default function HomePage() {
   const { sendTransaction, status: txStatus} = useMiniKit()
   const [showAirdropLink, setShowAirdropLink] = useState(false);
   const { contractDataRef, fetchContractDataRef } = useContractDataRef();
+  const [referral, setReferral] = useState<string | null>(null)
+  const [referral_name, setReferralName] = useState<string | null>(null)
+
+  useEffect(() => {
+    const storedReferral = localStorage.getItem('referrer');
+    if (storedReferral) {
+        setReferral(storedReferral);
+        const fetchUser = async () => {
+            const user = await MiniKit.getUserByAddress(storedReferral);
+            setReferralName(user?.username || null);
+        };
+        fetchUser();
+    }
+  }, []);
 
   // Función para saber si puede enviar recompensas de referido
   const handleClaimReward = async () => {
 
     //mostrar modal con explicacion y boton para transaccion
-
+      console.log("Reclamando recompensa de referido...", referral_name);
       try {
         /*
         await sendTransaction({
@@ -140,7 +155,7 @@ export default function HomePage() {
       >
           {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
           {/* Corazón flotante */}
-          {!contractDataRef.canReward && (
+          {(!contractDataRef.canReward && referral_name) && (
               <div className="fixed bottom-1/4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
                   <Heart size={64} className="text-yellow-400 fill-current" />
               </div>

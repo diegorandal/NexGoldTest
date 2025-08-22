@@ -80,6 +80,9 @@ export default function HomePage() {
 
   // Función para saber si puede enviar recompensas de referido
   const handleClaimReward = async () => {
+
+    //mostrar modal con explicacion y boton para transaccion
+
       try {
         /*
         await sendTransaction({
@@ -138,8 +141,8 @@ export default function HomePage() {
           {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
           {/* Corazón flotante */}
           {!contractDataRef.canReward && (
-              <div className="fixed top-4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
-                  <Heart size={64} className="text-yellow-400" />
+              <div className="fixed bottom-1/4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
+                  <Heart size={64} className="text-yellow-400 fill-current" />
               </div>
           )}
           <>

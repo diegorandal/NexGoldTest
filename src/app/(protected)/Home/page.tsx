@@ -156,8 +156,11 @@ export default function HomePage() {
           {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
           {/* Corazón flotante */}
           {(!contractDataRef.canReward && referral_name) && (
-              <div className="fixed bottom-1/4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
+              <div className="fixed bottom-1/4 right-4 z-50 animate-pulse cursor-pointer flex flex-col items-center" onClick={handleClaimReward}>
                   <Heart size={64} className="text-yellow-400 fill-current" />
+                  <span className="text-yellow-400 text-xs mt-1">
+                      {referral_name}
+                  </span>
               </div>
           )}
           <>

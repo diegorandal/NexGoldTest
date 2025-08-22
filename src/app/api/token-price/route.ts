@@ -11,7 +11,10 @@ export async function GET(request: Request) {
   const API_URL = `https://api.coingecko.com/api/v3/simple/token_price/optimism-ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`;
 
   try {
+    // Hacemos la llamada a CoinGecko desde el servidor
     const response = await fetch(API_URL, {
+      // AÑADIMOS CACHÉ: La respuesta se guardará y reutilizará durante 300 segundos (5 minutos)
+      next: { revalidate: 300 },
       headers: {
         'Accept': 'application/json',
       },
@@ -24,6 +27,7 @@ export async function GET(request: Request) {
     }
 
     const data = await response.json();
+    // Enviamos la respuesta de vuelta al cliente
     return NextResponse.json(data);
     
   } catch (error) {

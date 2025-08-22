@@ -135,6 +135,13 @@ export default function HomePage() {
           backgroundAttachment: "fixed",
         }}
       >
+          {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
+          {/* Corazón flotante */}
+          {!contractDataRef.canReward && (
+              <div className="fixed top-4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
+                  <Heart size={64} className="text-yellow-400" />
+              </div>
+          )}
           <>
             <div className="w-full max-w-md mx-auto">
               <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
@@ -158,15 +165,7 @@ export default function HomePage() {
                   <LinkButton href={'https://t.me/+_zr0basq5yQ4ZmIx'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>Telegram</LinkButton>
                   <LinkButton href={'https://x.com/N3xGold?s=09'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>X</LinkButton>
                 </div>
-
-                {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
-               {/* Corazón flotante */}
-                {!contractDataRef.canReward && (
-                    <div className="fixed top-4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
-                        <Heart size={48} className="text-yellow-400" />
-                    </div>
-                )}
-                
+               
                 {/* Lógica para mostrar el botón de Reclamar Airdrop */}
                 {isLoadingAirdrop ? (
                   <div className="text-center text-yellow-400">

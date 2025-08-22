@@ -18,7 +18,7 @@ export const Navigation = () => {
     { key: "stake", href: "/stake", icon: BanknoteArrowDown, label: "STAKE" },
     { key: "history", href: "/history", icon: History, label: "HISTORY" },
     { key: "book", href: "/", icon: House, label: "BOOK", center: true }, // La ruta principal es "/"
-    { key: "referral", href: "/referrals", icon: Contact, label: "REFERRAL" }, // Ruta a la nueva página
+    { key: "referral", href: "/Referrals", icon: Contact, label: "REFERRAL" }, // Ruta a la nueva página
     { key: "allies", href: "/allies", icon: HeartHandshake, label: "ALLIES" },
   ];
 

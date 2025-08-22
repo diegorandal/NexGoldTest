@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Contract address is required' }, { status: 400 });
   }
 
-  const API_URL = `https://opt-mainnet.g.alchemy.com/v2/${apiKey}`;
+  const API_URL = `https://worldchain-mainnet.g.alchemy.com/v2/${apiKey}`;
 
   // Opciones para la solicitud fetch
   const options = {

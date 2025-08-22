@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import { useMiniKit } from "@/hooks/use-minikit";
 import { useContractData } from "@/hooks/use-contract-data"; 
 import { parseEther } from "viem"; 
-import { useRouter } from "next/navigation";
 import { Info, Loader, CheckCircle, XCircle } from 'lucide-react'
 import { Card, InputGold, GoldButton, LinkButton } from "@/components/ui-components"
 import NEX_GOLD_STAKING_ABI from "@/abi/NEX_GOLD_STAKING_ABI.json"
@@ -20,7 +19,6 @@ export default function StakePage() {
   const session = useSession();
   const isProcessing = status === "pending";
   const { contractData, fetchContractData, isLocked } = useContractData();
-  const router = useRouter();
 
   const params = {
     fromToken: 'WLD',
@@ -99,10 +97,6 @@ export default function StakePage() {
         args: [],
       }],
     });
-  };
-
-  const handleBack = () => {
-    router.back();
   };
 
   return (

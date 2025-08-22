@@ -3,7 +3,7 @@
 import { useState, useEffect, type FC, useCallback } from "react"
 import { parseEther, getAddress, formatEther } from "viem"
 import { useSession } from "next-auth/react"
-import { Info, Loader, CheckCircle, XCircle, History, DollarSign } from 'lucide-react' // Ícono añadido
+import { Info, Loader, CheckCircle, XCircle, History, DollarSign, Heart } from 'lucide-react' // Ícono añadido
 import { useRouter } from "next/navigation"
 import { Card, InputGold, GoldButton, BackButton, UserInfo, LinkButton } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
@@ -11,7 +11,10 @@ import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
 import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
+import { useContractDataRef } from "@/hooks/use-contract-data-ref"
+import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 
+const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const NEX_GOLD_STAKING_ADDRESS = "0xd025b92f1b56ada612bfdb0c6a40dfe27a0b4183"
 const NEX_GOLD_ADDRESS = "0xA3502E3348B549ba45Af8726Ee316b490f308dDC"
 const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
@@ -66,28 +69,6 @@ const TokenPrice: FC<{ contractAddress: string }> = ({ contractAddress }) => {
     );
 };
 
-const AnimatedMiningRewards: FC<{ lastUpdateTime: number; stakedBalance: number }> = ({ lastUpdateTime, stakedBalance }) => {
-  const [displayReward, setDisplayReward] = useState(0);
-  useEffect(() => {
-    if (!lastUpdateTime || lastUpdateTime === 0 || stakedBalance <= 0) {
-      setDisplayReward(0);
-      return;
-    }
-    const MINING_REWARD_RATE = 10;
-    const MINING_INTERVAL_SECONDS = 24 * 60 * 60;
-    const interval = setInterval(() => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const timeElapsed = nowSeconds - lastUpdateTime;
-      if (timeElapsed < 0) { setDisplayReward(0); return; }
-      const progressInCycle = (timeElapsed % MINING_INTERVAL_SECONDS) / MINING_INTERVAL_SECONDS;
-      const animatedReward = progressInCycle * MINING_REWARD_RATE;
-      setDisplayReward(animatedReward);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastUpdateTime, stakedBalance]);
-  return <p className="text-xl font-bold text-green-400">+{displayReward.toFixed(4)} NXG</p>;
-};
-
 export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
@@ -95,6 +76,26 @@ export default function HomePage() {
   const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
   const [showAirdropLink, setShowAirdropLink] = useState(false);
+  const { contractDataRef, fetchContractDataRef } = useContractDataRef();
+
+  // Función para saber si puede enviar recompensas de referido
+  const handleClaimReward = async () => {
+      try {
+        /*
+        await sendTransaction({
+              transaction: [{
+                  address: NEX_GOLD_REFERRAL_ADDRESS,
+                  abi: NEX_GOLD_REFERRAL_ABI as any,
+                  functionName: "claimReward",
+                  args: [],
+              }],
+          });
+          fetchContractDataRef(); // Vuelve a cargar los datos para actualizar el estado
+        */
+      } catch (error) {
+          console.error("Error al reclamar recompensa:", error);
+      }
+  };
 
   const handleClaimAirdrop = async () => {
     try {
@@ -157,6 +158,16 @@ export default function HomePage() {
                   <LinkButton href={'https://t.me/+_zr0basq5yQ4ZmIx'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>Telegram</LinkButton>
                   <LinkButton href={'https://x.com/N3xGold?s=09'}><img width="24" height="24" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>X</LinkButton>
                 </div>
+
+                {/* Lógica para mostrar el botón de Reclamar Recompensa de Referidos */}
+               {/* Corazón flotante */}
+                {!contractDataRef.canReward && (
+                    <div className="fixed top-4 right-4 z-50 animate-pulse cursor-pointer" onClick={handleClaimReward}>
+                        <Heart size={48} className="text-yellow-400" />
+                    </div>
+                )}
+                
+                {/* Lógica para mostrar el botón de Reclamar Airdrop */}
                 {isLoadingAirdrop ? (
                   <div className="text-center text-yellow-400">
                     <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...

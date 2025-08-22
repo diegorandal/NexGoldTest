@@ -6,7 +6,6 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useMiniKit } from "@/hooks/use-minikit"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
-import { useRouter } from 'next/navigation';
 import { Card, GoldButton, BackButton} from "@/components/ui-components"
 import { Loader, CheckCircle, XCircle } from 'lucide-react'
 

@@ -28,11 +28,9 @@ const allies = [
 
 export default function AlliesPage() {
     return (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in mx-2 mt-2 mb-60">
             <Card className="space-y-4">
-                
-                <h2 className="text-xl font-bold text-yellow-400 text-center">Nuestras Alianzas</h2>
-                
+                <h2 className="text-xl font-bold text-yellow-400 text-center">Alianzas</h2>
                 {allies.length > 0 ? (
                     <div className="space-y-4">
                         {allies.map((ally, index) => (
@@ -43,7 +41,7 @@ export default function AlliesPage() {
                                     <Link href={ally.appLink} passHref legacyBehavior>
                                         <a target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
                                             <AppWindow size={16} />
-                                            <span>Ir a la App</span>
+                                            <span>Abrir App</span>
                                         </a>
                                     </Link>
                                     <Link href={ally.websiteLink} passHref legacyBehavior>

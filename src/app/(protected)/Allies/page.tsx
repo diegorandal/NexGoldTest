@@ -78,7 +78,7 @@ export default function AlliesPage() {
                     </div>
                 ) : (
                     !canClaimAirdrop && (
-                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
+                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-green-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
                         <Gift size={16} />
                         <span>Reclamar Airdrop DWD</span>
                     </button>

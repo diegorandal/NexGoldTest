@@ -16,7 +16,6 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 
-// --- Componente actualizado para mostrar el precio rotativo ---
 const TokenPrice: FC<{ balance: string }> = ({ balance }) => {
     const [price, setPrice] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +51,7 @@ const TokenPrice: FC<{ balance: string }> = ({ balance }) => {
 
         const intervalId = setInterval(() => {
             setDisplayMode(prevMode => (prevMode === 'price' ? 'total' : 'price'));
-        }, 3000); // Cambia cada 3 segundos
+        }, 3000);
 
         return () => clearInterval(intervalId);
     }, [isLoading, price]);
@@ -155,12 +154,9 @@ export default function HomePage() {
   if (status === "authenticated") {
     return (
       <div
-        className="min-h-screen flex flex-col justify-between p-4 pb-34 font-sans"
+        className="min-h-screen flex flex-col justify-center items-center p-4 font-sans"
         style={{
-          backgroundImage: "url('/background.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
+          background: "#000000",
         }}
       >
           {(contractDataRef.canReward && referral_name) && (
@@ -174,50 +170,50 @@ export default function HomePage() {
                   </span>
               </div>
           )}
-          <>
-            <div className="w-full max-w-md mx-auto">
-              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-                <div className="flex justify-center space-x-4">
-                    <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                        <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
-                    </a>
-                    <a href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                        <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>
-                    </a>
-                </div>
-                <UserInfo />
-                <div className="text-center space-y-2 flex flex-col items-center">
-                  {contractData.isLoading ? (
-                    <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
-                  ) : (
-                    <>
-                      <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
-                      <TokenPrice balance={contractData.availableBalance} />
-                    </>
-                  )}
-                </div>
+          <div className="w-full max-w-md mx-auto flex flex-col items-center space-y-6">
+            <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
+              <div className="flex justify-center space-x-4">
+                  <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                      <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
+                  </a>
+                  <a href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                      <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>
+                  </a>
+              </div>
+              <UserInfo />
+              <div className="text-center space-y-2 flex flex-col items-center">
+                {contractData.isLoading ? (
+                  <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
+                ) : (
+                  <>
+                    <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
+                    <TokenPrice balance={contractData.availableBalance} />
+                  </>
+                )}
               </div>
             </div>
 
-            <div className="w-full max-w-md mx-auto">
-              <div className="bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-                {isLoadingAirdrop ? (
-                  <div className="text-center text-yellow-400">
-                    <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
-                  </div>
-                ) : (
-                  canClaimAirdrop && (
-                    <GoldButton className="w-full" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
-                      🎁 Reclamar Airdrop DWD
-                    </GoldButton>
-                  )
-                )}
-                {showAirdropLink && (
-                  <LinkButton href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944">Abrir Destinity</LinkButton>
-                )}
-              </div>
+            <div className="my-4">
+              <img src="/logo.png" alt="NEXGOLD Logo" className="w-48 h-48 object-contain" />
             </div>
-          </>
+
+            <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
+              {isLoadingAirdrop ? (
+                <div className="text-center text-yellow-400">
+                  <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
+                </div>
+              ) : (
+                canClaimAirdrop && (
+                  <GoldButton className="w-full" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
+                    🎁 Reclamar Airdrop DWD
+                  </GoldButton>
+                )
+              )}
+              {showAirdropLink && (
+                <LinkButton href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944">Abrir Destinity</LinkButton>
+              )}
+            </div>
+          </div>
       </div>
     );
   }

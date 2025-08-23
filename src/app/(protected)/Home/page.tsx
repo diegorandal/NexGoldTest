@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
-import { Heart, Loader, DollarSign } from 'lucide-react'
+import { Heart, Loader, DollarSign, Wallet } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { UserInfo, LinkButton, GoldButton } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
@@ -16,32 +16,28 @@ import { MiniKit } from "@worldcoin/minikit-js"
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 
-// --- Componente para mostrar el precio del token desde GeckoTerminal ---
-const TokenPrice: FC = () => {
+// --- Componente actualizado para mostrar el precio rotativo ---
+const TokenPrice: FC<{ balance: string }> = ({ balance }) => {
     const [price, setPrice] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [displayMode, setDisplayMode] = useState<'price' | 'total'>('price');
 
     useEffect(() => {
         const fetchTokenPrice = async () => {
             const network = "world-chain";
-            const poolAddress = "0x7ecbb39f41b1dbfe46db164e6af9c1b601221c7c"; // Pool NXG/WETH
+            const poolAddress = "0x7ecbb39f41b1dbfe46db164e6af9c1b601221c7c";
             const apiUrl = `https://api.geckoterminal.com/api/v2/networks/${network}/pools/${poolAddress}`;
             
             try {
                 const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error('GeckoTerminal API response was not ok');
-                }
+                if (!response.ok) throw new Error('GeckoTerminal API response was not ok');
+                
                 const data = await response.json();
                 const priceUsd = data.data?.attributes?.base_token_price_usd;
                 
-                if (priceUsd) {
-                    setPrice(parseFloat(priceUsd));
-                } else {
-                    setPrice(null);
-                }
+                setPrice(priceUsd ? parseFloat(priceUsd) : null);
             } catch (error) {
-                console.error("Error fetching token price from GeckoTerminal:", error);
+                console.error("Error fetching token price:", error);
                 setPrice(null);
             } finally {
                 setIsLoading(false);
@@ -51,6 +47,16 @@ const TokenPrice: FC = () => {
         fetchTokenPrice();
     }, []);
 
+    useEffect(() => {
+        if (isLoading || price === null) return;
+
+        const intervalId = setInterval(() => {
+            setDisplayMode(prevMode => (prevMode === 'price' ? 'total' : 'price'));
+        }, 3000); // Cambia cada 3 segundos
+
+        return () => clearInterval(intervalId);
+    }, [isLoading, price]);
+
     if (isLoading) {
         return <div className="text-sm text-gray-400 animate-pulse">Cargando precio...</div>;
     }
@@ -59,13 +65,26 @@ const TokenPrice: FC = () => {
         return <div className="text-sm text-red-400">Precio no disponible</div>;
     }
 
+    const userBalance = parseFloat(balance) || 0;
+    const totalUsdValue = userBalance * price;
+
     return (
-        <div className="flex items-center justify-center text-sm text-gray-300 bg-white/10 py-1 px-3 rounded-full">
-            <DollarSign size={14} className="mr-1 text-green-400"/>
-            1 NXG = <span className="font-bold ml-1">${price.toFixed(4)} USD</span>
+        <div className="flex items-center justify-center text-sm text-gray-300 bg-white/10 py-1 px-3 rounded-full min-w-[200px] text-center">
+            {displayMode === 'price' ? (
+                <>
+                    <DollarSign size={14} className="mr-2 text-green-400"/>
+                    <span>1 NXG = <span className="font-bold ml-1">${price.toFixed(8)} USD</span></span>
+                </>
+            ) : (
+                <>
+                    <Wallet size={14} className="mr-2 text-yellow-400"/>
+                    <span>Balance: <span className="font-bold ml-1">${totalUsdValue.toFixed(4)} USD</span></span>
+                </>
+            )}
         </div>
     );
 };
+
 
 export default function HomePage() {
   const { status } = useSession()
@@ -167,13 +186,13 @@ export default function HomePage() {
                     </a>
                 </div>
                 <UserInfo />
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-2 flex flex-col items-center">
                   {contractData.isLoading ? (
                     <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
                   ) : (
                     <>
                       <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
-                      <TokenPrice />
+                      <TokenPrice balance={contractData.availableBalance} />
                     </>
                   )}
                 </div>

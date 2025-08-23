@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useMiniKit } from "@/hooks/use-minikit"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
-import { Card, GoldButton, BackButton} from "@/components/ui-components"
+import { Card, BackButton} from "@/components/ui-components"
 import { Loader, CheckCircle, XCircle, Copy } from 'lucide-react'
 
 export default function ReferralsPage() {
@@ -116,10 +116,21 @@ export default function ReferralsPage() {
                         </div>
                     )}
                     <div className="flex flex-col space-y-4 mb-4">
-                        {contractDataRef.canReward && (<GoldButton onClick={handleSendReward} className="w-full" disabled={isProcessing || (!referral && !rewardAddress)}>Enviar recompensa</GoldButton>)}
-                        <GoldButton onClick={handleCopyReferralLink} className="w-full">
+                        {contractDataRef.canReward && (
+                            <button
+                                onClick={handleSendReward}
+                                className="w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300 disabled:opacity-50"
+                                disabled={isProcessing || (!referral && !rewardAddress)}>
+                                Enviar recompensa
+                            </button>
+                        )}
+                        <button
+                            onClick={handleCopyReferralLink}
+                            className={`w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 rounded-lg transition-colors duration-300
+                                ${linkStatus === 'copied' ? 'bg-yellow-400 text-black border border-yellow-400' : 'bg-transparent text-yellow-400 border border-yellow-400'}
+                            `}>
                             {renderCopyButtonContent()}
-                        </GoldButton>
+                        </button>
                     </div>
                     <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
                     {contractDataRef.isLoading ? (

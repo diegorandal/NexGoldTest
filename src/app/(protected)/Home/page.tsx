@@ -4,15 +4,23 @@ import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
 import { Heart, Loader, DollarSign, Wallet } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import { UserInfo } from "@/components/ui-components"
+import { UserInfo, LinkButton } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { MiniKit } from "@worldcoin/minikit-js"
+import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
 
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 
+const params = {
+  fromToken: 'WLD',
+  toToken: '0xA3502E3348B549ba45Af8726Ee316b490f308dDC',
+  amount: '0',
+};
+
+const deeplink = getUnoDeeplinkUrl(params);
 
 const TokenPrice: FC<{ balance: string }> = ({ balance }) => {
     const [price, setPrice] = useState<number | null>(null);
@@ -151,7 +159,7 @@ export default function HomePage() {
           )}
           
           {/* --- Top Card (Header) --- */}
-          <div className="w-full max-w-md mx-auto pt-8">
+          <div className="w-full max-w-md mx-auto">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
               <UserInfo />
               <div className="text-center space-y-2 flex flex-col items-center">
@@ -161,6 +169,7 @@ export default function HomePage() {
                   <>
                     <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
                     <TokenPrice balance={contractData.availableBalance} />
+                    <LinkButton href={deeplink}>🛒 UNO</LinkButton>
                   </>
                 )}
               </div>

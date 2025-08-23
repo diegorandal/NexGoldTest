@@ -7,11 +7,18 @@ import {
   BanknoteArrowDown,
   History,
 } from "lucide-react";
-import Link from "next/link"; // Importa el componente Link
-import { usePathname } from "next/navigation"; // Importa el hook para obtener la URL
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { MiniKit } from '@worldcoin/minikit-js';
 
 export const Navigation = () => {
-  const pathname = usePathname(); // Obtiene la ruta actual de la URL
+  const pathname = usePathname();
+
+  const sendHapticFeedbackCommand = () =>
+    MiniKit.commands.sendHapticFeedback({
+      hapticsType: 'impact',
+      style: 'light',
+    });
 
   const tabs = [
     { key: "staking", href: "/Staking", icon: BanknoteArrowDown, label: "STAKE" },
@@ -26,13 +33,15 @@ export const Navigation = () => {
       <div className="grid grid-cols-5 items-center text-center">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = pathname === tab.href; // Compara la URL actual con el href del tab
+          const isActive = pathname === tab.href;
 
           if (tab.center) {
             return (
               <div key={tab.key} className="flex justify-center">
                 <Link
                   href={tab.href}
+                  // Aquí se añade el evento onClick para el feedback.
+                  onClick={sendHapticFeedbackCommand}
                   className={`relative -top-6 w-20 aspect-square rounded-full border-4 border-yellow-400 bg-black flex items-center justify-center transition-all duration-300 ${
                     isActive
                       ? "scale-110 shadow-yellow-400/70 shadow-xl"
@@ -54,6 +63,7 @@ export const Navigation = () => {
             <Link
               key={tab.key}
               href={tab.href}
+              onClick={sendHapticFeedbackCommand}
               className="flex flex-col items-center justify-center transition-all duration-300"
             >
               <Icon

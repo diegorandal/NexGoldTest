@@ -154,7 +154,7 @@ export default function HomePage() {
   if (status === "authenticated") {
     return (
       <div
-        className="min-h-screen flex flex-col justify-center items-center p-4 font-sans"
+        className="min-h-screen flex flex-col p-4 font-sans"
         style={{
           background: "#000000",
         }}
@@ -170,7 +170,8 @@ export default function HomePage() {
                   </span>
               </div>
           )}
-          <div className="w-full max-w-md mx-auto flex flex-col items-center space-y-6">
+          
+          <div className="w-full max-w-md mx-auto pt-8">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
               <div className="flex justify-center space-x-4">
                   <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
@@ -192,9 +193,11 @@ export default function HomePage() {
                 )}
               </div>
             </div>
+          </div>
 
+          <div className="flex-grow flex flex-col justify-center items-center space-y-8 w-full max-w-md mx-auto">
             <div className="my-4">
-              <img src="/logo.png" alt="NEXGOLD Logo" className="w-48 h-48 object-contain" />
+              <img src="/logo.png" alt="NEXGOLD Logo" className="w-56 h-56 object-contain" />
             </div>
 
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">

@@ -42,7 +42,7 @@ export default function AlliesPage() {
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
             <h3 className="font-bold text-lg text-white">NexGold</h3>
             <p className="text-sm text-gray-400">👑 poder digital con respaldo dorado ⚡️</p>
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
+            <div className="flex flex-row space-y-0 space-x-4 mt-2">
               <Link href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <ExternalLink size={16} />
                 <span>Telegram</span>
@@ -65,11 +65,10 @@ export default function AlliesPage() {
                     <AppWindow size={16} />
                     <span>Abrir App</span>
                 </Link>
-                <Link href="https://worldguilds.xyz" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
+                <Link href="https://t.me/+QPu0jzt-_PxjMmUx" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                     <ExternalLink size={16} />
-                    <span>Página Web</span>
+                    <span>Telegram</span>
                 </Link>
-                
                 {isLoadingAirdrop ? (
                     <div className="col-span-2 text-center text-yellow-400">
                     <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
@@ -89,7 +88,7 @@ export default function AlliesPage() {
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
             <h3 className="font-bold text-lg text-white">ProjectMiniApp</h3>
             <p className="text-sm text-gray-400">Desarrollamos la MiniApp de NexGold. ¿Tiene una idea? Contáctenos.</p>
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
+            <div className="flex flex-row space-y-0 space-x-4 mt-2">
               <Link href="https://projectminiapp.github.io/website/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <AppWindow size={16} />
                 <span>Sitio web</span>

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 
 // ▼▼▼ INTERRUPTOR DE MANTENIMIENTO ▼▼▼
 // Ponelo en `true` para bloquear la verificación, o en `false` para que funcione normal.
-let MAINTENANCE_MODE = true;
+let MAINTENANCE_MODE = false;
 
 export default function Page() {
   const { status } = useSession()

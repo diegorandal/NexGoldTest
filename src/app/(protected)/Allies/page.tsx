@@ -12,23 +12,22 @@ export default function AlliesPage() {
 
         <div className="space-y-4">
 
-          {/* Tarjeta 1: DWD */}
+          {/* Tarjeta 1: NexGold */}
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
-            <h3 className="font-bold text-lg text-white">DWD</h3>
-            <p className="text-sm text-gray-400">Llenar con la data de Walter, golems y NFTs</p>
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
-              <Link href="https://ecoswap.org/app" passHref legacyBehavior>
-                <a target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
-                  <AppWindow size={16} />
-                  <span>Abrir App</span>
+            <h3 className="font-bold text-lg text-white">NexGold</h3>
+            <p className="text-sm text-gray-400">👑 poder digital con respaldo dorado ⚡️</p>
+            {/* Contenedor de botones ajustado para diseño horizontal */}
+            <div className="flex flex-row space-x-2 md:space-x-4 mt-2">
+                {/* Botón de Telegram */}
+                <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="flex-1 flex flex-col items-center justify-center p-2 rounded-lg bg-gray-700/50 transition-transform hover:scale-105">
+                    <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
+                    <span className="text-sm mt-1 text-gray-300">Telegram</span>
                 </a>
-              </Link>
-              <Link href="https://ecoswap.org" passHref legacyBehavior>
-                <a target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-gray-400 text-gray-400 rounded-lg hover:bg-gray-400 hover:text-black transition-colors duration-300">
-                  <ExternalLink size={16} />
-                  <span>Página Web</span>
+                {/* Botón de X */}
+                <a href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="flex-1 flex flex-col items-center justify-center p-2 rounded-lg bg-gray-700/50 transition-transform hover:scale-105">
+                    <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>
+                    <span className="text-sm mt-1 text-gray-300">X</span>
                 </a>
-              </Link>
             </div>
           </div>
 

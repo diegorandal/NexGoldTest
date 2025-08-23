@@ -174,14 +174,6 @@ export default function HomePage() {
           {/* --- Top Card (Header) --- */}
           <div className="w-full max-w-md mx-auto pt-8">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-              <div className="flex justify-center space-x-4">
-                  <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                      <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
-                  </a>
-                  <a href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                      <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>
-                  </a>
-              </div>
               <UserInfo />
               <div className="text-center space-y-2 flex flex-col items-center">
                 {contractData.isLoading ? (

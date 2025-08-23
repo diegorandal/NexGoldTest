@@ -179,7 +179,8 @@ export default function HomePage() {
 
           {/* --- Centered Logo --- */}
           <div className="flex-grow flex justify-center items-center">
-            <img src="/logo.png" alt="NEXGOLD Logo" className="w-40 h-40 object-contain" />
+            {/* Se agrega la clase 'animate-pulse-heart' para el efecto de latido */}
+            <img src="/logo.png" alt="NEXGOLD Logo" className="w-60 h-60 object-contain animate-pulse-heart" />
           </div>
 
           {/* --- Bottom Card (Footer) --- */}

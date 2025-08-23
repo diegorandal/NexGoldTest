@@ -198,7 +198,7 @@ export default function HomePage() {
 
           {/* --- Centered Logo --- */}
           <div className="flex-grow flex justify-center items-center">
-            <img src="/logo.png" alt="NEXGOLD Logo" className="w-80 h-80 object-contain" />
+            <img src="/logo.png" alt="NEXGOLD Logo" className="w-40 h-40 object-contain" />
           </div>
 
           {/* --- Bottom Card (Footer) --- */}

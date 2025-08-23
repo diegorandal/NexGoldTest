@@ -45,28 +45,29 @@ export default function AlliesPage() {
             <h3 className="font-bold text-lg text-white">NexGold</h3>
             <p className="text-sm text-gray-400">👑 poder digital con respaldo dorado ⚡️</p>
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
-              <Link href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+              <Link href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <ExternalLink size={16} />
                 <span>Telegram</span>
               </Link>
-              <Link href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+              <Link href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <ExternalLink size={16} />
                 <span>X</span>
               </Link>
             </div>
           </div>
 
-          {/* Tarjeta 2: Destinity */}
+          {/* Tarjeta 2: Destinity - Lógica y diseño de cuadrícula actualizados */}
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
             <h3 className="font-bold text-lg text-white">Destinity</h3>
             <p className="text-sm text-gray-400">Ecosistema de NFTs, juegos y finanzas descentralizadas.</p>
             
+            {/* Contenedor de botones con diseño de cuadrícula */}
             <div className="grid grid-cols-2 gap-4 mt-2">
-                <Link href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+                <Link href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                     <AppWindow size={16} />
                     <span>Abrir App</span>
                 </Link>
-                <Link href="https://worldguilds.xyz" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+                <Link href="https://worldguilds.xyz" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                     <ExternalLink size={16} />
                     <span>Página Web</span>
                 </Link>
@@ -76,8 +77,8 @@ export default function AlliesPage() {
                     <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
                     </div>
                 ) : (
-                    canClaimAirdrop && (
-                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
+                    !canClaimAirdrop && (
+                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
                         <Gift size={16} />
                         <span>Reclamar Airdrop DWD</span>
                     </button>
@@ -91,16 +92,18 @@ export default function AlliesPage() {
             <h3 className="font-bold text-lg text-white">ProjectMiniApp</h3>
             <p className="text-sm text-gray-400">Desarrollamos la MiniApp de NexGold. ¿Tiene una idea para una app? Contáctenos.</p>
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
-              <Link href="https://projectminiapp.github.io/website/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+              <Link href="https://projectminiapp.github.io/website/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <AppWindow size={16} />
                 <span>Sitio web</span>
               </Link>
-              <Link href="https://t.me/+aA5Sy3B8dvZjZDFh" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-colors duration-300">
+              <Link href="https://t.me/+aA5Sy3B8dvZjZDFh" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <ExternalLink size={16} />
                 <span>Telegram</span>
               </Link>
             </div>
           </div>
+
+          {/* Otras iniciativas */ }
 
         </div>
       </Card>

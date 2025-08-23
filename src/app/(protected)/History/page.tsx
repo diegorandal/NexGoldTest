@@ -75,16 +75,18 @@ export default function HistoryPage() {
         }
 
         return (
-            <div className="bg-white/10 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div className="flex-1">
-                    <p className={`font-bold break-all ${isIncoming ? 'text-green-400' : 'text-red-400'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
-                    <p className="text-sm text-gray-400 break-all">{isIncoming ? `De: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)}` : `A: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`}</p>
-                </div>
-                <div className="mt-2 md:mt-0 md:ml-4 text-right">
+            <div className="bg-white/10 p-4 rounded-lg flex flex-col justify-between items-start md:items-center space-y-2">
+                {/* Fila superior: Fecha y Enlace */}
+                <div className="flex justify-between items-center w-full">
                     <p className="text-xs text-gray-500">{date}</p>
                     <a href={`https://worldscan.org/tx/${tx.hash}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 text-sm hover:underline">
                         Ver Transacción
                     </a>
+                </div>
+                {/* Fila inferior: Cantidad y Dirección */}
+                <div className="flex justify-between items-center w-full">
+                    <p className={`font-bold break-all ${isIncoming ? 'text-green-400' : 'text-red-400'}`}>{isIncoming ? '+' : '-'} {amount} NXG</p>
+                    <p className="text-sm text-gray-400 break-all">{isIncoming ? `De: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)}` : `A: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`}</p>
                 </div>
             </div>
         );

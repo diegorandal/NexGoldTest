@@ -171,6 +171,7 @@ export default function HomePage() {
               </div>
           )}
           
+          {/* --- Top Card (Header) --- */}
           <div className="w-full max-w-md mx-auto pt-8">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
               <div className="flex justify-center space-x-4">
@@ -195,11 +196,13 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="flex-grow flex flex-col justify-center items-center space-y-8 w-full max-w-md mx-auto">
-            <div className="my-4">
-              <img src="/logo.png" alt="NEXGOLD Logo" className="w-56 h-56 object-contain" />
-            </div>
+          {/* --- Centered Logo --- */}
+          <div className="flex-grow flex justify-center items-center">
+            <img src="/logo.png" alt="NEXGOLD Logo" className="w-80 h-80 object-contain" />
+          </div>
 
+          {/* --- Bottom Card (Footer) --- */}
+          <div className="w-full max-w-md mx-auto pb-8">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
               {isLoadingAirdrop ? (
                 <div className="text-center text-yellow-400">

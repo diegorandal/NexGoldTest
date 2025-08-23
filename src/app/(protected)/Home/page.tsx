@@ -4,17 +4,15 @@ import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
 import { Heart, Loader, DollarSign, Wallet } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import { UserInfo, LinkButton, GoldButton } from "@/components/ui-components"
+import { UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
-import { useContractDataAirdrop } from "@/hooks/use-contract-data-airdrop"
-import AIRDROP_ABI from "@/abi/AIRDROP_ABI.json"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { MiniKit } from "@worldcoin/minikit-js"
 
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
-const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
+
 
 const TokenPrice: FC<{ balance: string }> = ({ balance }) => {
     const [price, setPrice] = useState<number | null>(null);
@@ -89,9 +87,7 @@ export default function HomePage() {
   const { status } = useSession()
   const router = useRouter()
   const { contractData } = useContractData()
-  const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop()
   const { sendTransaction, status: txStatus} = useMiniKit()
-  const [showAirdropLink, setShowAirdropLink] = useState(false);
   const { contractDataRef } = useContractDataRef();
   const [referral, setReferral] = useState<string | null>(null)
   const [referral_name, setReferralName] = useState<string | null>(null)
@@ -123,23 +119,6 @@ export default function HomePage() {
           console.error("Error al enviar recompensa:", error)
       }
   };
-
-  const handleClaimAirdrop = async () => {
-    try {
-      await sendTransaction({
-        transaction: [{
-          address: AIRDROP_ADDRESS,
-          abi: AIRDROP_ABI as any,
-          functionName: "claimTokens",
-          args: [],
-        }],
-      })
-      fetchAirdropData()
-      setShowAirdropLink(true);
-    } catch (error) {
-      console.error("Error al enviar recompensa:", error)
-    }
-  }
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -196,20 +175,7 @@ export default function HomePage() {
           {/* --- Bottom Card (Footer) --- */}
           <div className="w-full max-w-md mx-auto pb-8">
             <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-              {isLoadingAirdrop ? (
-                <div className="text-center text-yellow-400">
-                  <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
-                </div>
-              ) : (
-                canClaimAirdrop && (
-                  <GoldButton className="w-full" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
-                    🎁 Reclamar Airdrop DWD
-                  </GoldButton>
-                )
-              )}
-              {showAirdropLink && (
-                <LinkButton href="https://world.org/mini-app?app_id=app_9364e8ee9845fe89fc2f35bdca45e944">Abrir Destinity</LinkButton>
-              )}
+             
             </div>
           </div>
       </div>

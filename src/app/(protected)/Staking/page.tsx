@@ -146,7 +146,7 @@ export default function StakePage() {
             <InputGold type="number" placeholder="Cantidad de NXG" value={amount} onChange={(e: any) => setAmount(e.target.value)} />
             <div className="grid grid-cols-2 gap-4"><GoldButton onClick={handleStake} disabled={isProcessing}>Stake</GoldButton><GoldButton onClick={handleUnstake} disabled={isProcessing || Number.parseFloat(contractData.availableBalance) <= 0}>Unstake</GoldButton></div>
             <GoldButton onClick={handleClaim} className="w-full" disabled={isProcessing || Number.parseFloat(contractData.stakedBalance) <= 0}>Reclamar Recompensas</GoldButton>
-            <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable. 🚨 unete a</p>
+            <p className="text-center text-xs text-gray-400 pt-2">🚨 Si retiras tus fondos en staking antes de tiempo solo recibes el 50%, el resto es destinado a la quema (🔥) automática, manteniendo una economía estable.</p>
           </>
         )}
         <div className="h-10 text-center text-sm flex items-center justify-center">

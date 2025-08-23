@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react"
 import { useMiniKit } from "@/hooks/use-minikit"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { Card, GoldButton, BackButton} from "@/components/ui-components"
-import { Loader, CheckCircle, XCircle } from 'lucide-react'
+import { Loader, CheckCircle, XCircle, Copy } from 'lucide-react'
 
 export default function ReferralsPage() {
     const { contractDataRef, fetchContractDataRef } = useContractDataRef()
@@ -16,6 +16,7 @@ export default function ReferralsPage() {
     const [rewardAddress, setRewardAddress] = useState('');
     const { data: session } = useSession()
     const { sendTransaction, status, error } = useMiniKit()
+    const [linkStatus, setLinkStatus] = useState<'copy' | 'copied' | 'error'>('copy');
     
     const isProcessing = status === "pending"
     const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
@@ -42,8 +43,12 @@ export default function ReferralsPage() {
         const enlace = `https://world.org/mini-app?app_id=app_48bf75430fa1e83c8063dc451b9decde&path=/invite?ref=${ref}`
         try {
             await navigator.clipboard.writeText(enlace)
+            setLinkStatus('copied');
+            setTimeout(() => setLinkStatus('copy'), 2000); // Vuelve al estado original después de 2 segundos
         } catch (error) {
             console.error("Error al copiar el enlace de referido:", error)
+            setLinkStatus('error');
+            setTimeout(() => setLinkStatus('copy'), 2000); // Vuelve al estado original después de 2 segundos
         }
     }
 
@@ -67,6 +72,33 @@ export default function ReferralsPage() {
         }
     }
 
+    const renderCopyButtonContent = () => {
+        switch (linkStatus) {
+            case 'copied':
+                return (
+                    <>
+                        <CheckCircle />
+                        <span>¡Copiado!</span>
+                    </>
+                );
+            case 'error':
+                return (
+                    <>
+                        <XCircle />
+                        <span>Error al copiar</span>
+                    </>
+                );
+            case 'copy':
+            default:
+                return (
+                    <>
+                        <Copy />
+                        <span>Copiar mi enlace</span>
+                    </>
+                );
+        }
+    }
+
     return (
     <div className="animate-fade-in mx-4 mt-4 mb-60">
         <Card className="space-y-4">
@@ -83,9 +115,11 @@ export default function ReferralsPage() {
                             <input type="text" value={rewardAddress} onChange={(e) => setRewardAddress(e.target.value)} placeholder="0x..." className="p-2 rounded-lg bg-gray-800 text-white border border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-500" />
                         </div>
                     )}
-                    <div className="flex flex-col space-y-4">
+                    <div className="flex flex-col space-y-4 mb-4">
                         {contractDataRef.canReward && (<GoldButton onClick={handleSendReward} className="w-full" disabled={isProcessing || (!referral && !rewardAddress)}>Enviar recompensa</GoldButton>)}
-                        <GoldButton onClick={handleCopyReferralLink}>Copiar mi enlace</GoldButton>
+                        <GoldButton onClick={handleCopyReferralLink} className="w-full">
+                            {renderCopyButtonContent()}
+                        </GoldButton>
                     </div>
                     <div className="text-center"><h2 className="text-2xl font-bold text-yellow-400">TOP 3 Referidos</h2></div>
                     {contractDataRef.isLoading ? (

@@ -12,7 +12,6 @@ import { Loader } from 'lucide-react'
 export default function AlliesPage() {
 
     const { canClaimAirdrop, isLoadingAirdrop, fetchAirdropData } = useContractDataAirdrop();
-    const [showAirdropLink, setShowAirdropLink] = useState(false);
     const { sendTransaction, status: txStatus} = useMiniKit()
     const AIRDROP_ADDRESS = "0x237057b5f3d1d2b3622df39875948e4857e52ac8"
 
@@ -27,7 +26,6 @@ export default function AlliesPage() {
             }],
         })
         fetchAirdropData()
-        setShowAirdropLink(true);
         } catch (error) {
         console.error("Error al enviar recompensa:", error)
         }
@@ -77,8 +75,8 @@ export default function AlliesPage() {
                     <Loader className="animate-spin inline-block mr-2" /> Cargando airdrop...
                     </div>
                 ) : (
-                    !canClaimAirdrop && (
-                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-green-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
+                    canClaimAirdrop && (
+                    <button className="col-span-2 w-full inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-green-500 text-green-500 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300" onClick={handleClaimAirdrop} disabled={txStatus === "pending"}>
                         <Gift size={16} />
                         <span>Reclamar Airdrop DWD</span>
                     </button>
@@ -90,7 +88,7 @@ export default function AlliesPage() {
           {/* Tarjeta 3: ProjectMiniApp */}
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
             <h3 className="font-bold text-lg text-white">ProjectMiniApp</h3>
-            <p className="text-sm text-gray-400">Desarrollamos la MiniApp de NexGold. ¿Tiene una idea para una app? Contáctenos.</p>
+            <p className="text-sm text-gray-400">Desarrollamos la MiniApp de NexGold. ¿Tiene una idea? Contáctenos.</p>
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-2">
               <Link href="https://projectminiapp.github.io/website/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 text-sm px-4 py-2 border border-yellow-400 text-yellow-400 rounded-lg active:bg-yellow-400 active:text-black transition-colors duration-300">
                 <AppWindow size={16} />

@@ -91,7 +91,7 @@ export default function HistoryPage() {
     };
 
     return (
-        <div className="animate-fade-in mx-4 mt-4 mb-60">
+        <div className="animate-fade-in mx-4 mt-4 pb-24">
             <Card className="space-y-4">
                 <h2 className="text-xl font-bold text-yellow-400 text-center">Historial de Transacciones</h2>
                 {isLoading ? (

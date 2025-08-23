@@ -4,13 +4,14 @@ import { useState, useEffect, type FC } from "react"
 import { useSession } from "next-auth/react"
 import { Heart, Loader, DollarSign, Wallet } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import { UserInfo, LinkButton } from "@/components/ui-components"
+import { UserInfo } from "@/components/ui-components"
 import { useMiniKit } from "@/hooks/use-minikit"
 import { useContractData } from "@/hooks/use-contract-data"
 import { useContractDataRef } from "@/hooks/use-contract-data-ref"
 import NEX_GOLD_REFERRAL_ABI from "@/abi/NEX_GOLD_REFERRAL_ABI.json"
 import { MiniKit } from "@worldcoin/minikit-js"
 import { getUnoDeeplinkUrl } from '../../lib/linkUNO';
+import Link from 'next/link';
 
 const NEX_GOLD_REFERRAL_ADDRESS = "0x23f3f8c7f97c681f822c80cad2063411573cf8d3"
 
@@ -146,6 +147,7 @@ export default function HomePage() {
           background: "#000000",
         }}
       >
+          {/* --- HEART REFERRAL --- */}
           {(contractDataRef.canReward && referral_name) && (
               <div className="fixed bottom-1/4 right-4 z-50 animate-pulse cursor-pointer flex flex-col items-center" onClick={handleClaimReward}>
                   <Heart size={64} className="text-yellow-400 fill-current" />
@@ -167,9 +169,8 @@ export default function HomePage() {
                   <div className="text-yellow-400 p-2"><Loader className="animate-spin inline-block mr-2" /> Cargando...</div>
                 ) : (
                   <>
-                    <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG</p>
+                    <p className="text-xl font-bold text-yellow-400">💳 {Number.parseFloat(contractData.availableBalance).toFixed(4)} NXG  <Link href={deeplink}>🛒</Link></p>
                     <TokenPrice balance={contractData.availableBalance} />
-                    <LinkButton href={deeplink}>🛒 UNO</LinkButton>
                   </>
                 )}
               </div>

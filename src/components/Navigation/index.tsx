@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from "react";
 import {
   Contact,
   House,
@@ -16,10 +15,10 @@ export const Navigation = () => {
 
   const tabs = [
     { key: "staking", href: "/Staking", icon: BanknoteArrowDown, label: "STAKE" },
-    { key: "history", href: "/History", icon: History, label: "HISTORY" },
+    { key: "history", href: "/History", icon: History, label: "HISTORIAL" },
     { key: "home", href: "/Home", icon: House, label: "HOME", center: true },
-    { key: "referral", href: "/Referrals", icon: Contact, label: "REFERRAL" },
-    { key: "allies", href: "/Allies", icon: HeartHandshake, label: "ALLIES" },
+    { key: "referral", href: "/Referrals", icon: Contact, label: "REFERIDOS" },
+    { key: "allies", href: "/Allies", icon: HeartHandshake, label: "COMUNIDAD" },
   ];
 
   return (
@@ -64,7 +63,7 @@ export const Navigation = () => {
                 }`}
               />
               <span
-                className={`text-xs transition-colors duration-300 ${
+                className={`text-[0.625rem] transition-colors duration-300 ${
                   isActive ? "text-yellow-400 font-semibold" : "text-gray-400"
                 }`}
               >

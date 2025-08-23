@@ -6,7 +6,7 @@ import { Card } from "@/components/ui-components";
 
 export default function AlliesPage() {
   return (
-    <div className="animate-fade-in mx-4 mt-4 mb-60">
+    <div className="animate-fade-in mx-4 mt-4 pb-24">
       <Card className="space-y-4">
         <h2 className="text-xl font-bold text-yellow-400 text-center">Comunidad</h2>
 
@@ -16,14 +16,11 @@ export default function AlliesPage() {
           <div className="bg-white/10 p-4 rounded-lg flex flex-col space-y-2">
             <h3 className="font-bold text-lg text-white">NexGold</h3>
             <p className="text-sm text-gray-400">👑 poder digital con respaldo dorado ⚡️</p>
-            {/* Contenedor de botones ajustado para diseño horizontal */}
             <div className="flex flex-row space-x-2 md:space-x-4 mt-2">
-                {/* Botón de Telegram */}
                 <a href={'https://t.me/+_zr0basq5yQ4ZmIx'} target="_blank" rel="noopener noreferrer" className="flex-1 flex flex-col items-center justify-center p-2 rounded-lg bg-gray-700/50 transition-transform hover:scale-105">
                     <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/telegram.png" alt="telegram"/>
                     <span className="text-sm mt-1 text-gray-300">Telegram</span>
                 </a>
-                {/* Botón de X */}
                 <a href={'https://x.com/N3xGold?s=09'} target="_blank" rel="noopener noreferrer" className="flex-1 flex flex-col items-center justify-center p-2 rounded-lg bg-gray-700/50 transition-transform hover:scale-105">
                     <img width="32" height="32" src="https://img.icons8.com/3d-fluency/94/x.png" alt="x"/>
                     <span className="text-sm mt-1 text-gray-300">X</span>

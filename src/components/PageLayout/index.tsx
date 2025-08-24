@@ -39,11 +39,9 @@ const Main = (props: { children: ReactNode; className?: string }) => {
   );
 };
 
-// --- CAMBIO REALIZADO AQUÍ ---
-// Se ha quitado 'px-6' para permitir que el footer ocupe el ancho completo.
 const Footer = (props: { children: ReactNode; className?: string }) => {
   return (
-    <footer className={twMerge('pb-[35px]', clsx(props.className))}>
+    <footer className={twMerge('px-6 pb-[35px]', clsx(props.className))}>
       {props.children}
     </footer>
   );

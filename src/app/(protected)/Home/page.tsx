@@ -182,13 +182,6 @@ export default function HomePage() {
             {/* Se agrega la clase 'animate-pulse-heart' para el efecto de latido */}
             <img src="/logo.png" alt="NEXGOLD Logo" className="w-60 h-60 object-contain animate-pulse-heart" />
           </div>
-
-          {/* --- Bottom Card (Footer) --- */}
-          <div className="w-full max-w-md mx-auto pb-8">
-            <div className="w-full bg-black/30 backdrop-blur-lg border border-yellow-500/20 rounded-2xl shadow-2xl shadow-yellow-500/10 p-6 space-y-4">
-             
-            </div>
-          </div>
       </div>
     );
   }
